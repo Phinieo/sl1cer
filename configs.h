@@ -18,7 +18,7 @@
 //START-UP CODES//
 //////////////////
 
-#define START_GCODES "M107\nM190 S65 ; set bed temperature and wait for it to be reached\nM104 S215 ; set temperature\nG28 ; home all axes\nG1 Z5 F5000 ; lift nozzlen\nM109 S215 ; set temperature and wait for it to be reached\nG21 ; set units to millimeters\nG90 ; use absolute coordinates\nM82 ; use absolute distances for extrusion\nG92 E0\nG1 Z0.400 F7800.000\nG1 E-2.00000 F2400.00000\nG92 E0"
+#define START_GCODES "M107\nM190 S65 ; set bed temperature and wait for it to be reached\nM104 S215 ; set temperature\nG28 ; home all axes\nG1 Z5 F5000 ; lift nozzlen\nM109 S215 ; set temperature and wait for it to be reached\nG21 ; set units to millimeters\nG90 ; use absolute coordinates\nM82 ; use absolute distances for extrusion\nG92 E0\nG1 E-2.00000 F2400.00000\nG92 E0\n"
  
 
 
@@ -61,7 +61,7 @@
 
 #define LAYER_HEIGHT 0.4
 
-#define PERIMETERS 3
+#define PERIMETERS 5
 
 #define EXTRUSION_WIDTH_MULTIPLIER 1.0
 
