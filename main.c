@@ -30,7 +30,7 @@ int main(){
 
 
     //COMPUTE AND MOVE TO STARTING POSITION OF FIRST LINE
-    moveToStart(fp);
+    moveToPerimeterStart(fp,2);
 
     fputs("\n\n",fp);
 
@@ -47,7 +47,7 @@ int main(){
 
 
 
-    printModPerimeter(fp,&currentZ,&currentE);
+    printAllPerimeters(fp,&currentZ,&currentE);
 
 
 

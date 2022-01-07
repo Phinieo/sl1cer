@@ -61,7 +61,7 @@
 
 #define LAYER_HEIGHT 0.4
 
-#define PERIMETERS 5
+#define PERIMETERS 3
 
 #define EXTRUSION_WIDTH_MULTIPLIER 1.0
 
