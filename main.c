@@ -44,15 +44,20 @@ int main(){
     fputs("\n\n",fp);
 
 
+    
+    while(currentZ < OBJECT_Z){
+
+        
+        printAllPerimeters(fp,&currentZ,&currentE);
+
+
+    }
+
+
+    writeEnd(fp);
 
 
 
-    printAllPerimeters(fp,&currentZ,&currentE);
-
-
-
-
-    printf("%f\n",currentZ);
 
     fclose(fp);
 
