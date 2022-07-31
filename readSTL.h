@@ -18,13 +18,11 @@ struct tri{
 };
 
 
-struct tri* readSTL(char* filename){
+struct tri* readSTL(char* filename, int* numTriangles){
 
    FILE* fp;
 
    char wordIn = '\0'; 
-
-   int numTriangles = 0;
 
 
    fp = fopen(filename, "r");
@@ -38,23 +36,19 @@ struct tri* readSTL(char* filename){
 
       fread(&wordIn, sizeof(char), 1, fp);
 
-      printf("%c",wordIn);
-
    }
 
 
    //READ 4 BYTE NUMBER OF TRIANGLES
-   fread(&numTriangles, sizeof(char), 4, fp);
-
-   printf("\n%d\n",numTriangles);
+   fread(numTriangles, sizeof(char), 4, fp);
 
 
 
 
    //READ ALL TRIANGLES
-   struct tri* triangles = calloc(numTriangles, sizeof(struct tri));
+   struct tri* triangles = calloc(*numTriangles, sizeof(struct tri));
 
-   for(int i = 0; i < numTriangles; i++){
+   for(int i = 0; i < *numTriangles; i++){
 
       fread(&(triangles[i].normal.X), sizeof(char), 4, fp);
       fread(&(triangles[i].normal.Y), sizeof(char), 4, fp);
@@ -79,8 +73,7 @@ struct tri* readSTL(char* filename){
 
 
    fclose(fp);
-
-
+ 
 
    return triangles;
 

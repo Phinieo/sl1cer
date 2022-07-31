@@ -1,0 +1,290 @@
+
+//p1 MUST BE HIGHER Z THAN p2
+//p1 AND p2 MUST NOT BE INTERSECTED BY sliceHeight
+struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
+
+   float dX = p2.X - p1.X;
+   float dY = p2.Y - p1.Y;
+   float dZ = p2.Z - p1.Z;
+
+   float percent = (sliceHeight - p1.Z) / dZ;
+
+   float X = (dX * percent) + p1.X;
+   float Y = (dY * percent) + p1.Y;
+   float Z = sliceHeight;
+
+   struct point intersectionPoint;
+   intersectionPoint.X = X;
+   intersectionPoint.Y = Y;
+   intersectionPoint.Z = Z;
+
+   return intersectionPoint;
+
+}
+
+
+
+
+
+
+//ADDS POINT TO LIST IF IT IS NOT CURRENTLY IN LIST
+int addUniquePoint(struct point p, struct point* points, int* numPoints){
+
+   for(int i = 0; i < *numPoints; i++){
+
+      if(p.X == points[i].X && p.Y == points[i].Y && p.Z == points[i].Z){
+
+         return 0;
+
+      }
+
+   }
+
+
+   points[*numPoints] = p;
+
+   *numPoints = *numPoints + 1;
+
+
+   return 1;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+int slice(struct tri* triangles, int numTriangles){
+
+
+   float currentHeight = 0;
+
+
+
+   //FIND MAX HEIGHT
+   float maxHeight = 0;
+
+
+   for(int i = 0; i < numTriangles; i++){
+
+
+      if(triangles[i].p1.Z > maxHeight){
+
+         maxHeight = triangles[i].p1.Z;
+
+      }
+
+
+      if(triangles[i].p2.Z > maxHeight){
+
+         maxHeight = triangles[i].p2.Z;
+
+      }
+
+
+      if(triangles[i].p3.Z > maxHeight){
+
+         maxHeight = triangles[i].p3.Z;
+
+      }
+
+
+   }
+
+
+
+
+
+
+
+   //SLICE FROM THE BOTTOM UP
+   for(currentHeight = 0; currentHeight < (maxHeight + (LAYER_HEIGHT/2)); currentHeight += LAYER_HEIGHT){
+
+
+
+      //not sure what to set the maximum number of possible layer vertices as
+      struct point layerPoints[numTriangles*3*999];
+      int layerPointsI = 0;
+
+
+
+
+      //FIND ALL POINTS THAT LIE ON CURRENT LAYER
+      for(int i = 0; i < numTriangles; i++){
+
+
+         if(triangles[i].p1.Z == currentHeight){
+
+            
+            addUniquePoint(triangles[i].p1, layerPoints, &layerPointsI);
+
+
+         }
+
+
+         if(triangles[i].p2.Z == currentHeight){
+            
+
+            addUniquePoint(triangles[i].p2, layerPoints, &layerPointsI);
+
+
+         }
+
+
+         if(triangles[i].p3.Z == currentHeight){
+
+            
+            addUniquePoint(triangles[i].p3, layerPoints, &layerPointsI);
+
+         }
+
+
+      }
+
+
+
+
+
+
+
+
+
+
+      //FIND ALL POINTS THAT LIE ON LINES INTERSECTED BY CURRENT LAYER
+      for(int i = 0; i < numTriangles; i++){
+
+
+
+
+         //FIND A POINT BELOW THE CURRENT LAYER
+         if(triangles[i].p1.Z < currentHeight){
+
+
+            if(triangles[i].p2.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p1, triangles[i].p2), layerPoints, &layerPointsI);
+
+
+            }
+
+            if(triangles[i].p3.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p1, triangles[i].p3), layerPoints, &layerPointsI);
+
+
+            }
+
+
+         }
+
+
+
+
+
+
+         //FIND A POINT BELOW THE CURRENT LAYER
+         if(triangles[i].p2.Z < currentHeight){
+
+
+            if(triangles[i].p1.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p2, triangles[i].p1), layerPoints, &layerPointsI);
+
+
+            }
+
+            if(triangles[i].p3.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p2, triangles[i].p3), layerPoints, &layerPointsI);
+
+
+            }
+
+
+         }
+
+
+
+
+
+         //FIND A POINT BELOW THE CURRENT LAYER
+         if(triangles[i].p3.Z < currentHeight){
+
+
+            if(triangles[i].p1.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p3, triangles[i].p1), layerPoints, &layerPointsI);
+
+
+            }
+
+            if(triangles[i].p2.Z > currentHeight){
+
+
+               addUniquePoint(intersectLine(currentHeight, triangles[i].p3, triangles[i].p2), layerPoints, &layerPointsI);
+
+
+            }
+
+
+         }
+
+
+
+
+
+
+
+      }
+
+
+
+
+
+
+
+      printf("%d Points\n",layerPointsI);
+
+
+      for(int i = 0; i < layerPointsI; i++){
+
+         printf("X: %f, Y: %f, Z: %f\n",layerPoints[i].X,layerPoints[i].Y,layerPoints[i].Z);
+
+         for(int i2 = 0; i2 < layerPointsI; i2++){
+
+            if(layerPoints[i].X == layerPoints[i2].X && layerPoints[i].Y == layerPoints[i2].Y && layerPoints[i].Z == layerPoints[i2].Z && i2 != i){
+
+               printf("Duplicate points!\n");
+
+            }
+
+         }
+
+      }
+
+
+
+
+
+
+
+
+   }
+
+
+
+   return 0;
+
+}
