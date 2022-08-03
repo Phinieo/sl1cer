@@ -68,6 +68,9 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+
+
    //FIND MAX HEIGHT
    float maxHeight = 0;
 
@@ -99,7 +102,7 @@ int slice(struct tri* triangles, int numTriangles){
    }
 
 
-
+   printf("\n\n\n\n\nMAX HEIGHT: %f\n\n\n\n\n\n",maxHeight);
 
 
 
@@ -109,9 +112,18 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+
+
       //not sure what to set the maximum number of possible layer vertices as
       struct point layerPoints[numTriangles*3*999];
       int layerPointsI = 0;
+
+
+
+
+
+
 
 
 
@@ -252,6 +264,7 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+      //SLICING DONE (EXCEPT FOR POSSIBLE TOP LAYER) EXECUTE CONVERSION TO G-CODE 
 
 
 
@@ -279,9 +292,103 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+      //(THIS IS THE POSSIBLE TOP LAYER) - IF AN EXTRA LAYER IS CLOSER TO REAL OBJECT HEIGHT THAN CURRENT LAYER HEIGHT
+
+
+
+
+
+
+      //if(currentHeight + LAYER_HEIGHT > maxHeight && maxHeight - currentHeight < maxHeight + LAYER_HEIGHT - currentHeight){
+      if(currentHeight + LAYER_HEIGHT > maxHeight  && maxHeight - (currentHeight + LAYER_HEIGHT) < (currentHeight + LAYER_HEIGHT) - maxHeight){
+
+
+
+         //not sure what to set the maximum number of possible layer vertices as
+         struct point lastPoints[numTriangles*3*999];
+         layerPointsI = 0;
+
+
+
+
+
+         //FIND ALL POINTS THAT LIE ON CURRENT LAYER
+         for(int i = 0; i < numTriangles; i++){
+
+
+            if(triangles[i].p1.Z == maxHeight){
+
+            
+               struct point temp1 = triangles[i].p1;
+               temp1.Z = currentHeight + LAYER_HEIGHT;
+               addUniquePoint(temp1, lastPoints, &layerPointsI);
+
+
+            }
+
+
+            if(triangles[i].p2.Z == maxHeight){
+            
+               struct point temp2 = triangles[i].p2;
+               temp2.Z = currentHeight + LAYER_HEIGHT;
+               addUniquePoint(temp2, lastPoints, &layerPointsI);
+
+
+            }
+
+
+            if(triangles[i].p3.Z == maxHeight){
+
+               struct point temp3 = triangles[i].p3;
+               temp3.Z = currentHeight + LAYER_HEIGHT;
+               addUniquePoint(temp3, lastPoints, &layerPointsI);
+
+            }
+
+
+         } 
+
+
+
+
+
+
+         printf("%d Points\n",layerPointsI);
+
+
+         for(int i = 0; i < layerPointsI; i++){
+
+            printf("X: %f, Y: %f, Z: %f\n",lastPoints[i].X,lastPoints[i].Y,lastPoints[i].Z);
+
+            for(int i2 = 0; i2 < layerPointsI; i2++){
+
+               if(layerPoints[i].X == lastPoints[i2].X && lastPoints[i].Y == lastPoints[i2].Y && lastPoints[i].Z == lastPoints[i2].Z && i2 != i){
+
+                  printf("Duplicate points!\n");
+
+               }
+
+            }
+
+         }
+
+
+
+      }
+
+
+
+
+
+
+
+
+
+
 
 
    }
+
 
 
 
