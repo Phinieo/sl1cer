@@ -37,12 +37,31 @@ int main(){
    slice(triangles, numTriangles);
 
 
-/*
-   printf("X: %f, ",triangles[2].p3.X);
-   printf("Y: %f, ",triangles[2].p3.Y);
-   printf("Z: %f",triangles[2].p3.Z);
-   printf("\n");
-*/
+
+
+
+   printf("\n\n\nINTERSECTION TEST\n\n");
+
+
+   struct tri testTri;
+   testTri.p1.X = 5;
+   testTri.p1.Y = 5;
+   testTri.p1.Z = 1;
+
+   testTri.p2.X = -5;
+   testTri.p2.Y = -5;
+   testTri.p2.Z = 0;
+
+   testTri.p3.X = 0;
+   testTri.p3.Y = 0;
+   testTri.p3.Z = 10;
+
+
+   struct point tempPoint = intersectLine(0.1, testTri.p1, testTri.p2);
+
+
+   printf("%d\n\n",pointIsOnTri(tempPoint,testTri));
+
 
    return 0;
 

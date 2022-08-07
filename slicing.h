@@ -1,6 +1,18 @@
 
-//p1 MUST BE HIGHER Z THAN p2
-//p1 AND p2 MUST NOT BE INTERSECTED BY sliceHeight
+struct edge{
+
+   struct point p1;
+   struct point p2;
+
+};
+
+
+
+
+
+
+//p2 MUST BE HIGHER Z THAN p1
+//p1 AND p2 MUST BE INTERSECTED BY sliceHeight
 struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
 
    float dX = p2.X - p1.X;
@@ -23,6 +35,113 @@ struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
 }
 
 
+
+
+int pointIsOnTri(struct point p, struct tri triangle){
+
+
+
+
+   if((triangle.p2.Z > p.Z && triangle.p1.Z < p.Z) || (triangle.p2.Z < p.Z && triangle.p1.Z > p.Z)){
+
+      if(triangle.p2.Z > triangle.p1.Z){
+
+         struct point temp = intersectLine(p.Z, triangle.p1, triangle.p2);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+            return 1; 
+
+         }
+
+      }else{
+
+
+         struct point temp = intersectLine(p.Z, triangle.p2, triangle.p1);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+           return 1; 
+
+         }
+
+      }
+
+   }
+
+
+
+
+
+
+   if((triangle.p3.Z > p.Z && triangle.p2.Z < p.Z) || (triangle.p3.Z < p.Z && triangle.p2.Z > p.Z)){
+
+      if(triangle.p3.Z > triangle.p2.Z){
+
+         struct point temp = intersectLine(p.Z, triangle.p2, triangle.p3);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+            return 1; 
+
+         }
+
+      }else{
+
+
+         struct point temp = intersectLine(p.Z, triangle.p3, triangle.p2);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+           return 1; 
+
+         }
+
+      }
+
+   }
+
+
+
+   if((triangle.p1.Z > p.Z && triangle.p3.Z < p.Z) || (triangle.p1.Z < p.Z && triangle.p3.Z > p.Z)){
+
+      if(triangle.p1.Z > triangle.p3.Z){
+
+         struct point temp = intersectLine(p.Z, triangle.p3, triangle.p1);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+            return 1; 
+
+         }
+
+      }else{
+
+
+         struct point temp = intersectLine(p.Z, triangle.p1, triangle.p3);
+
+         if(temp.X == p.X && temp.Y == temp.Y){
+
+           return 1; 
+
+         }
+
+      }
+
+   }
+
+
+
+
+
+
+
+
+
+
+   return 0;
+
+}
 
 
 
@@ -107,8 +226,13 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+
+
+
+
    //SLICE FROM THE BOTTOM UP
-   for(currentHeight = 0; currentHeight < (maxHeight + (LAYER_HEIGHT/2)); currentHeight += LAYER_HEIGHT){
+   for(currentHeight = 0; currentHeight < maxHeight; currentHeight += LAYER_HEIGHT){
 
 
 
@@ -300,8 +424,9 @@ int slice(struct tri* triangles, int numTriangles){
 
 
       //if(currentHeight + LAYER_HEIGHT > maxHeight && maxHeight - currentHeight < maxHeight + LAYER_HEIGHT - currentHeight){
-      if(currentHeight + LAYER_HEIGHT > maxHeight  && maxHeight - (currentHeight + LAYER_HEIGHT) < (currentHeight + LAYER_HEIGHT) - maxHeight){
+      if(currentHeight + LAYER_HEIGHT > maxHeight  && maxHeight - currentHeight > (currentHeight + LAYER_HEIGHT) - maxHeight){
 
+         printf("\n\nFINAL CONDITIONAL LAYER\n\n");
 
 
          //not sure what to set the maximum number of possible layer vertices as
