@@ -61,7 +61,7 @@
 //RESOLUTION & WIDTH//
 //////////////////////
 
-#define LAYER_HEIGHT 0.3
+#define LAYER_HEIGHT 0.6
 
 #define PERIMETERS 3
 

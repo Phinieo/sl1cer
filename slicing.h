@@ -35,12 +35,71 @@ struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
 }
 
 
+//pointIsOnTri FUNCTION BUT ONLY FOR THE LAST CONDITIONAL LAYER
+int pointIsAboveTri(struct point p, struct tri triangle){
+
+
+   //IF POINT IS AN EXACT POINT OF THE TRIANGLE EXCEPT FOR Z
+
+   if(triangle.p1.X == p.X && triangle.p1.Y == p.Y && triangle.p1.Z < p.Z){
+
+      return 1;
+
+   }
+
+
+   if(triangle.p2.X == p.X && triangle.p2.Y == p.Y && triangle.p2.Z < p.Z){
+
+      return 1;
+
+   }
+
+
+   if(triangle.p3.X == p.X && triangle.p3.Y == p.Y && triangle.p3.Z < p.Z){
+
+      return 1;
+
+   }
+
+
+
+
+   return 0;
+
+}
+
 
 
 int pointIsOnTri(struct point p, struct tri triangle){
 
 
+   //IF POINT IS AN EXACT POINT OF THE TRIANGLE
 
+   if(triangle.p1.X == p.X && triangle.p1.Y == p.Y && triangle.p1.Z == p.Z){
+
+      return 1;
+
+   }
+
+
+   if(triangle.p2.X == p.X && triangle.p2.Y == p.Y && triangle.p2.Z == p.Z){
+
+      return 1;
+
+   }
+
+
+   if(triangle.p3.X == p.X && triangle.p3.Y == p.Y && triangle.p3.Z == p.Z){
+
+      return 1;
+
+   }
+
+
+
+
+
+   //IF POINT IS ON AN EDGE OF THE TRIANGLE
 
    if((triangle.p2.Z > p.Z && triangle.p1.Z < p.Z) || (triangle.p2.Z < p.Z && triangle.p1.Z > p.Z)){
 
@@ -48,7 +107,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p1, triangle.p2);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
             return 1; 
 
@@ -59,7 +118,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p2, triangle.p1);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
            return 1; 
 
@@ -80,7 +139,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p2, triangle.p3);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
             return 1; 
 
@@ -91,7 +150,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p3, triangle.p2);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
            return 1; 
 
@@ -109,7 +168,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p3, triangle.p1);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
             return 1; 
 
@@ -120,7 +179,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p1, triangle.p3);
 
-         if(temp.X == p.X && temp.Y == temp.Y){
+         if(temp.X == p.X && temp.Y == p.Y){
 
            return 1; 
 
@@ -129,8 +188,6 @@ int pointIsOnTri(struct point p, struct tri triangle){
       }
 
    }
-
-
 
 
 
@@ -416,14 +473,92 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+      //CONVERT POINTS TO EDGES
+
+      struct edge layerEdges[layerPointsI*2];
+
+      int layerEdgesI = 0;
+      
+
+      for(int i = 0; i < layerPointsI; i++){
+
+         for(int i2 = 0; i2 < numTriangles; i2++){
+
+            if(pointIsOnTri(layerPoints[i], triangles[i2])){
+
+               for(int i3 = 0; i3 < layerPointsI; i3++){
+
+                  if(i3 != i && pointIsOnTri(layerPoints[i3], triangles[i2])){
+
+                     //CHECK TO SEE IF FIRST EDGE POINT IS ALREADY A FIRST EDGE POINT TO AVOID DUPLICATE LOOP
+                     
+                     int isInEdgeList = 0;
+                     for(int i4 = 0; i4 < layerEdgesI; i4++){
+
+                        //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
+                        if(layerEdges[i4].p1.X == layerPoints[i].X && layerEdges[i4].p1.Y == layerPoints[i].Y){
+
+
+                           isInEdgeList = 1;
+
+                        
+                        }
+
+                        //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
+
+                        if(layerEdges[i4].p2.X == layerPoints[i].X && layerEdges[i4].p2.Y == layerPoints[i].Y){
+
+
+                           if(layerEdges[i4].p1.X == layerPoints[i3].X && layerEdges[i4].p1.Y == layerPoints[i3].Y){
+
+                              isInEdgeList = 1; 
+
+                           }
+
+                        }
+
+
+
+
+                     }
+                     
+                     //ADD EDGE IF ALL CHECKS ARE GOOD
+                     if(!isInEdgeList){
+
+                        layerEdges[layerEdgesI].p1 = layerPoints[i];
+                        layerEdges[layerEdgesI].p2 = layerPoints[i3];
+                        printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[layerEdgesI].p1.X,layerEdges[layerEdgesI].p1.Y,layerEdges[layerEdgesI].p2.X,layerEdges[layerEdgesI].p2.Y);
+
+                        layerEdgesI++;
+
+                     }
+
+                  }
+
+               }
+
+            }
+
+         }
+
+      }
+
+
+      printf("\n\nEDGES: %d\n\n",layerEdgesI);
+
+
+
+
+
+
+
+
+
+
       //(THIS IS THE POSSIBLE TOP LAYER) - IF AN EXTRA LAYER IS CLOSER TO REAL OBJECT HEIGHT THAN CURRENT LAYER HEIGHT
 
 
-
-
-
-
-      //if(currentHeight + LAYER_HEIGHT > maxHeight && maxHeight - currentHeight < maxHeight + LAYER_HEIGHT - currentHeight){
       if(currentHeight + LAYER_HEIGHT > maxHeight  && maxHeight - currentHeight > (currentHeight + LAYER_HEIGHT) - maxHeight){
 
          printf("\n\nFINAL CONDITIONAL LAYER\n\n");
@@ -499,6 +634,98 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+         //CONVERT POINTS TO EDGES
+
+         struct edge layerEdges[layerPointsI*2];
+
+         int layerEdgesI = 0;
+      
+
+         for(int i = 0; i < layerPointsI; i++){
+
+            for(int i2 = 0; i2 < numTriangles; i2++){
+
+               if(pointIsAboveTri(lastPoints[i], triangles[i2])){
+
+                  for(int i3 = 0; i3 < layerPointsI; i3++){
+
+                     if(i3 != i && pointIsAboveTri(lastPoints[i3], triangles[i2])){
+
+                     
+                        int isInEdgeList = 0;
+                        for(int i4 = 0; i4 < layerEdgesI; i4++){
+
+                           //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
+                           if(layerEdges[i4].p1.X == lastPoints[i].X && layerEdges[i4].p1.Y == lastPoints[i].Y){
+
+
+                              isInEdgeList = 1;
+
+                        
+                           }
+
+                           //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
+
+                           if(layerEdges[i4].p2.X == lastPoints[i].X && layerEdges[i4].p2.Y == lastPoints[i].Y){
+
+
+                              if(layerEdges[i4].p1.X == lastPoints[i3].X && layerEdges[i4].p1.Y == lastPoints[i3].Y){
+
+                                 isInEdgeList = 1; 
+
+                              }
+
+                           }
+
+
+
+
+                        }
+                     
+                        //ADD EDGE IF ALL CHECKS ARE GOOD
+                        if(!isInEdgeList){
+
+                           layerEdges[layerEdgesI].p1 = lastPoints[i];
+                           layerEdges[layerEdgesI].p2 = lastPoints[i3];
+                           printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[layerEdgesI].p1.X,layerEdges[layerEdgesI].p1.Y,layerEdges[layerEdgesI].p2.X,layerEdges[layerEdgesI].p2.Y);
+
+                           layerEdgesI++;
+
+                        }
+
+                     }
+
+                  }
+
+               }
+
+            }
+
+         }
+
+
+         printf("\n\nEDGES: %d\n\n",layerEdgesI);
+
+
+
+
+
+
+
+
+
+
+
+
+      //CONVERT CONDITIONAL LAYER TO GCODE
+
+
+
+
+
+
+
+      //END OF CONDITIONAL FINAL LAYER IF
       }
 
 
@@ -510,8 +737,7 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
-
-
+   //END OF HEIGHT BASED SLICING LOOP
    }
 
 
