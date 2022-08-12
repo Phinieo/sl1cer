@@ -2,8 +2,8 @@
 //FILE//
 ////////
 
-#define STL_IN "20MMCube.stl"
-#define GCODE_OUT "20MMCubeGEN.gcode"
+#define STL_IN "cube.stl"
+#define GCODE_OUT "testGcode.gcode"
 
 #define OBJECT_X 20
 #define OBJECT_Y 20

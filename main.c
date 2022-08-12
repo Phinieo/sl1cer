@@ -9,9 +9,42 @@
 int main(){
 
 
+   FILE *fp;
+
+   fp = fopen(GCODE_OUT, "w");
+
+
+   //WRITE STARTING GCODES INCLUDING HOMING AND TEMPERATURES
+   //N
+   writeStart(fp);
+
+   fputs("\n\n",fp);
+
+
+
+
+
+   //UNDO EARLY EXTRUDER RETRACTION
+
+   fputs("G1 E2.00000 F2400.00000",fp);
+
+   fputs("\n\n",fp);
+
+
+
+
+
+
+   //DO PRINTING
+   
+
+
+
+
+
    int numTriangles = 0;
 
-   struct tri* triangles = readSTL("cube.stl", &numTriangles);
+   struct tri* triangles = readSTL(STL_IN, &numTriangles);
 
    for(int i = 0; i < numTriangles; i++){
 
@@ -29,6 +62,13 @@ int main(){
       printf("Y: %f, ",triangles[i].p3.Y);
       printf("Z: %f\n",triangles[i].p3.Z);
 
+      printf("Normal: ");
+      printf("X: %f, ",triangles[i].normal.X);
+      printf("Y: %f, ",triangles[i].normal.Y);
+      printf("Z: %f\n",triangles[i].normal.Z);
+
+
+
       printf("\n\n");
      
 
@@ -41,27 +81,18 @@ int main(){
 
 
 
-   printf("\n\n\nINTERSECTION TEST\n\n");
 
 
-   struct tri testTri;
-   testTri.p1.X = 5;
-   testTri.p1.Y = 5;
-   testTri.p1.Z = 1;
-
-   testTri.p2.X = -5;
-   testTri.p2.Y = -5;
-   testTri.p2.Z = 0;
-
-   testTri.p3.X = 0;
-   testTri.p3.Y = 0;
-   testTri.p3.Z = 10;
 
 
-   struct point tempPoint = intersectLine(0.1, testTri.p1, testTri.p2);
+   //WRITE THE END GCODE
+   writeEnd(fp);
 
 
-   printf("%d\n\n",pointIsOnTri(tempPoint,testTri));
+   //CLOSE THE FILE POINTER
+   fclose(fp);
+
+
 
 
    return 0;

@@ -18,6 +18,7 @@ struct tri{
 };
 
 
+//RETURNED POINTER MUST BE FREE'D
 struct tri* readSTL(char* filename, int* numTriangles){
 
    FILE* fp;

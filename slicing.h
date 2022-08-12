@@ -10,7 +10,6 @@ struct edge{
 
 
 
-
 //p2 MUST BE HIGHER Z THAN p1
 //p1 AND p2 MUST BE INTERSECTED BY sliceHeight
 struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
@@ -235,6 +234,136 @@ int addUniquePoint(struct point p, struct point* points, int* numPoints){
 
 
 
+//RETURNED POINTER MUST BE FREE'D
+struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct tri* triangles, int numTriangles, int* layerEdgesI){
+
+
+
+
+   //FIND MAX HEIGHT
+   float maxHeight = 0;
+
+
+   for(int i = 0; i < numTriangles; i++){
+
+
+      if(triangles[i].p1.Z > maxHeight){
+
+         maxHeight = triangles[i].p1.Z;
+
+      }
+
+
+      if(triangles[i].p2.Z > maxHeight){
+
+         maxHeight = triangles[i].p2.Z;
+
+      }
+
+
+      if(triangles[i].p3.Z > maxHeight){
+
+         maxHeight = triangles[i].p3.Z;
+
+      }
+
+
+   }
+
+
+   struct edge* layerEdges = calloc(layerPointsI*2, sizeof(struct edge));
+
+
+   *layerEdgesI = 0;
+
+   for(int i = 0; i < layerPointsI; i++){
+
+      for(int i2 = 0; i2 < numTriangles; i2++){
+
+         if(pointIsOnTri(layerPoints[i], triangles[i2]) || (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2]))){
+
+            for(int i3 = 0; i3 < layerPointsI; i3++){
+
+               if(i3 != i && (pointIsOnTri(layerPoints[i3], triangles[i2]) || (layerPoints[i3].Z > maxHeight &&
+                   pointIsAboveTri(layerPoints[i3], triangles[i2])))){
+
+                  //CHECK TO SEE IF FIRST EDGE POINT IS ALREADY A FIRST EDGE POINT TO AVOID DUPLICATE LOOP
+                     
+                  int isInEdgeList = 0;
+                  for(int i4 = 0; i4 < *layerEdgesI; i4++){
+
+                     //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
+                     if(layerEdges[i4].p1.X == layerPoints[i].X && layerEdges[i4].p1.Y == layerPoints[i].Y){
+
+
+                        isInEdgeList = 1;
+
+                     
+                     }
+
+                     //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
+
+                     if(layerEdges[i4].p2.X == layerPoints[i].X && layerEdges[i4].p2.Y == layerPoints[i].Y){
+
+
+                        if(layerEdges[i4].p1.X == layerPoints[i3].X && layerEdges[i4].p1.Y == layerPoints[i3].Y){
+
+                           isInEdgeList = 1; 
+
+                        }
+
+                     }
+
+
+
+
+                  }
+                     
+                  //ADD EDGE IF ALL CHECKS ARE GOOD
+                  if(!isInEdgeList){
+
+                     layerEdges[*layerEdgesI].p1 = layerPoints[i];
+                     layerEdges[*layerEdgesI].p2 = layerPoints[i3];
+                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI].p1.X,layerEdges[*layerEdgesI].p1.Y,layerEdges[*layerEdgesI].p2.X,layerEdges[*layerEdgesI].p2.Y);
+                     
+                     *layerEdgesI = *layerEdgesI + 1;
+                  
+                  }
+
+               }
+
+            }
+
+         }
+
+      }
+
+   }
+
+
+   printf("\n\nEDGES: %d\n\n",*layerEdgesI);
+
+
+
+
+
+
+
+
+
+
+
+   return layerEdges;
+
+}
+
+
+
+
+
+
+
+
 
 
 int slice(struct tri* triangles, int numTriangles){
@@ -296,12 +425,18 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+
+
+
+
+
+
+
+
       //not sure what to set the maximum number of possible layer vertices as
-      struct point layerPoints[numTriangles*3*999];
+      struct point layerPoints[numTriangles];
       int layerPointsI = 0;
-
-
-
 
 
 
@@ -445,6 +580,8 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
+
+
       //SLICING DONE (EXCEPT FOR POSSIBLE TOP LAYER) EXECUTE CONVERSION TO G-CODE 
 
 
@@ -476,76 +613,26 @@ int slice(struct tri* triangles, int numTriangles){
 
       //CONVERT POINTS TO EDGES
 
-      struct edge layerEdges[layerPointsI*2];
-
       int layerEdgesI = 0;
-      
 
-      for(int i = 0; i < layerPointsI; i++){
-
-         for(int i2 = 0; i2 < numTriangles; i2++){
-
-            if(pointIsOnTri(layerPoints[i], triangles[i2])){
-
-               for(int i3 = 0; i3 < layerPointsI; i3++){
-
-                  if(i3 != i && pointIsOnTri(layerPoints[i3], triangles[i2])){
-
-                     //CHECK TO SEE IF FIRST EDGE POINT IS ALREADY A FIRST EDGE POINT TO AVOID DUPLICATE LOOP
-                     
-                     int isInEdgeList = 0;
-                     for(int i4 = 0; i4 < layerEdgesI; i4++){
-
-                        //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
-                        if(layerEdges[i4].p1.X == layerPoints[i].X && layerEdges[i4].p1.Y == layerPoints[i].Y){
-
-
-                           isInEdgeList = 1;
-
-                        
-                        }
-
-                        //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
-
-                        if(layerEdges[i4].p2.X == layerPoints[i].X && layerEdges[i4].p2.Y == layerPoints[i].Y){
-
-
-                           if(layerEdges[i4].p1.X == layerPoints[i3].X && layerEdges[i4].p1.Y == layerPoints[i3].Y){
-
-                              isInEdgeList = 1; 
-
-                           }
-
-                        }
+      struct edge* layerEdges = pointsToEdges(layerPoints, layerPointsI, triangles, numTriangles, &layerEdgesI);
 
 
 
 
-                     }
-                     
-                     //ADD EDGE IF ALL CHECKS ARE GOOD
-                     if(!isInEdgeList){
-
-                        layerEdges[layerEdgesI].p1 = layerPoints[i];
-                        layerEdges[layerEdgesI].p2 = layerPoints[i3];
-                        printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[layerEdgesI].p1.X,layerEdges[layerEdgesI].p1.Y,layerEdges[layerEdgesI].p2.X,layerEdges[layerEdgesI].p2.Y);
-
-                        layerEdgesI++;
-
-                     }
-
-                  }
-
-               }
-
-            }
-
-         }
-
-      }
+      //CONVERT EDGES TO GCODE
 
 
-      printf("\n\nEDGES: %d\n\n",layerEdgesI);
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -565,7 +652,7 @@ int slice(struct tri* triangles, int numTriangles){
 
 
          //not sure what to set the maximum number of possible layer vertices as
-         struct point lastPoints[numTriangles*3*999];
+         struct point lastPoints[numTriangles];
          layerPointsI = 0;
 
 
@@ -634,77 +721,13 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
-         //CONVERT POINTS TO EDGES
-
-         struct edge layerEdges[layerPointsI*2];
-
-         int layerEdgesI = 0;
-      
-
-         for(int i = 0; i < layerPointsI; i++){
-
-            for(int i2 = 0; i2 < numTriangles; i2++){
-
-               if(pointIsAboveTri(lastPoints[i], triangles[i2])){
-
-                  for(int i3 = 0; i3 < layerPointsI; i3++){
-
-                     if(i3 != i && pointIsAboveTri(lastPoints[i3], triangles[i2])){
-
-                     
-                        int isInEdgeList = 0;
-                        for(int i4 = 0; i4 < layerEdgesI; i4++){
-
-                           //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
-                           if(layerEdges[i4].p1.X == lastPoints[i].X && layerEdges[i4].p1.Y == lastPoints[i].Y){
-
-
-                              isInEdgeList = 1;
-
-                        
-                           }
-
-                           //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
-
-                           if(layerEdges[i4].p2.X == lastPoints[i].X && layerEdges[i4].p2.Y == lastPoints[i].Y){
-
-
-                              if(layerEdges[i4].p1.X == lastPoints[i3].X && layerEdges[i4].p1.Y == lastPoints[i3].Y){
-
-                                 isInEdgeList = 1; 
-
-                              }
-
-                           }
 
 
 
 
-                        }
-                     
-                        //ADD EDGE IF ALL CHECKS ARE GOOD
-                        if(!isInEdgeList){
+         layerEdgesI = 0;
 
-                           layerEdges[layerEdgesI].p1 = lastPoints[i];
-                           layerEdges[layerEdgesI].p2 = lastPoints[i3];
-                           printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[layerEdgesI].p1.X,layerEdges[layerEdgesI].p1.Y,layerEdges[layerEdgesI].p2.X,layerEdges[layerEdgesI].p2.Y);
-
-                           layerEdgesI++;
-
-                        }
-
-                     }
-
-                  }
-
-               }
-
-            }
-
-         }
-
-
-         printf("\n\nEDGES: %d\n\n",layerEdgesI);
+         struct edge* layerEdges = pointsToEdges(lastPoints, layerPointsI, triangles, numTriangles, &layerEdgesI);
 
 
 
@@ -713,11 +736,7 @@ int slice(struct tri* triangles, int numTriangles){
 
 
 
-
-
-
-
-      //CONVERT CONDITIONAL LAYER TO GCODE
+         //CONVERT CONDITIONAL LAYER TO GCODE
 
 
 
@@ -727,6 +746,13 @@ int slice(struct tri* triangles, int numTriangles){
 
       //END OF CONDITIONAL FINAL LAYER IF
       }
+
+
+
+
+
+
+
 
 
 
