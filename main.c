@@ -74,10 +74,11 @@ int main(){
 
    }
 
+   int numEdges = 0;
 
-   slice(triangles, numTriangles);
+   slice(triangles, numTriangles, 40.2, &numEdges);
 
-
+   printf("\nMAIN: NUM EDGES: %d\n",numEdges);
 
 
 
