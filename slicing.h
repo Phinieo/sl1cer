@@ -1,13 +1,4 @@
 
-struct edge{
-
-   struct point p1;
-   struct point p2;
-
-};
-
-
-
 
 
 //p2 MUST BE HIGHER Z THAN p1
@@ -280,12 +271,13 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
       for(int i2 = 0; i2 < numTriangles; i2++){
 
-         if(pointIsOnTri(layerPoints[i], triangles[i2]) || (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2]))){
+         if( !(triFacesUp(triangles[i2]) || triFacesDown(triangles[i2])) &&
+             pointIsOnTri(layerPoints[i], triangles[i2])    ||    (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2]))    ){
 
             for(int i3 = 0; i3 < layerPointsI; i3++){
 
-               if(i3 != i && (pointIsOnTri(layerPoints[i3], triangles[i2]) || (layerPoints[i3].Z > maxHeight &&
-                   pointIsAboveTri(layerPoints[i3], triangles[i2])))){
+               if(   i3 != i && 
+                   (pointIsOnTri(layerPoints[i3], triangles[i2])     ||      (layerPoints[i3].Z > maxHeight && pointIsAboveTri(layerPoints[i3], triangles[i2])))     ){
 
                   //CHECK TO SEE IF FIRST EDGE POINT IS ALREADY A FIRST EDGE POINT TO AVOID DUPLICATE LOOP
                      

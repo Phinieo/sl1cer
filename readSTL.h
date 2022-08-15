@@ -1,23 +1,4 @@
 
-struct point{
-
-   float X;
-   float Y;
-   float Z;
-
-};
-
-struct tri{
-
-   struct point p1;
-   struct point p2;
-   struct point p3;
-
-   struct point normal;
-
-};
-
-
 //RETURNED POINTER MUST BE FREE'D
 struct tri* readSTL(char* filename, int* numTriangles){
 
@@ -54,6 +35,8 @@ struct tri* readSTL(char* filename, int* numTriangles){
       fread(&(triangles[i].normal.X), sizeof(char), 4, fp);
       fread(&(triangles[i].normal.Y), sizeof(char), 4, fp);
       fread(&(triangles[i].normal.Z), sizeof(char), 4, fp);
+
+      printf("\n\n%f,%f,%f\n\n",triangles[i].normal.X,triangles[i].normal.Y,triangles[i].normal.Z);
 
       fread(&(triangles[i].p1.X), sizeof(char), 4, fp);
       fread(&(triangles[i].p1.Y), sizeof(char), 4, fp);

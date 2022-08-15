@@ -1,8 +1,10 @@
 #include "libs.h"
 #include "configs.h"
+
+#include "structs.h"
 #include "readSTL.h"
-#include "gcode.h"
 #include "slicing.h"
+#include "gcode.h"
 
 
 
@@ -22,6 +24,14 @@ int main(){
 
 
 
+   //EXTRUSION AND POSITION VARIABLES FOR CURRENT STATE OF PRINTHEAD
+   struct point currentLocation;
+   currentLocation.X = 0;
+   currentLocation.Y = 0;
+   currentLocation.Z = 0;
+
+   float currentExtrusion = 0;
+
 
 
    //UNDO EARLY EXTRUDER RETRACTION
@@ -30,6 +40,7 @@ int main(){
 
    fputs("\n\n",fp);
 
+   currentExtrusion += 2;
 
 
 
@@ -42,43 +53,34 @@ int main(){
 
 
 
+
+
+
+
+
    int numTriangles = 0;
 
    struct tri* triangles = readSTL(STL_IN, &numTriangles);
 
-   for(int i = 0; i < numTriangles; i++){
-
-      printf("Triangle %d\n",i);
-
-      printf("X: %f, ",triangles[i].p1.X);
-      printf("Y: %f, ",triangles[i].p1.Y);
-      printf("Z: %f\n",triangles[i].p1.Z);
-
-      printf("X: %f, ",triangles[i].p2.X);
-      printf("Y: %f, ",triangles[i].p2.Y);
-      printf("Z: %f\n",triangles[i].p2.Z);
-
-      printf("X: %f, ",triangles[i].p3.X);
-      printf("Y: %f, ",triangles[i].p3.Y);
-      printf("Z: %f\n",triangles[i].p3.Z);
-
-      printf("Normal: ");
-      printf("X: %f, ",triangles[i].normal.X);
-      printf("Y: %f, ",triangles[i].normal.Y);
-      printf("Z: %f\n",triangles[i].normal.Z);
 
 
-
-      printf("\n\n");
-     
-
-   }
 
    int numEdges = 0;
 
-   slice(triangles, numTriangles, 40.2, &numEdges);
+   struct edge* layerEdges = slice(triangles, numTriangles, 20.4, &numEdges);
 
    printf("\nMAIN: NUM EDGES: %d\n",numEdges);
+
+
+
+
+
+
+   
+   writeLayerPerim(layerEdges, &numEdges, &currentLocation, &currentExtrusion, fp);
+
+
+
 
 
 
