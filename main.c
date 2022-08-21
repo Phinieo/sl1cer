@@ -4,6 +4,7 @@
 #include "structs.h"
 #include "readSTL.h"
 #include "slicing.h"
+#include "extrusion.h"
 #include "gcode.h"
 
 
@@ -65,21 +66,23 @@ int main(){
 
 
 
+
+
    int numEdges = 0;
 
-   struct edge* layerEdges = slice(triangles, numTriangles, 20.4, &numEdges);
+   do{
 
-   printf("\nMAIN: NUM EDGES: %d\n",numEdges);
-
-
+      struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
 
 
+      writeLayerPerim(layerEdges, &numEdges, &currentLocation, &currentExtrusion, fp);
 
 
-   
-   writeLayerPerim(layerEdges, &numEdges, &currentLocation, &currentExtrusion, fp);
+      layerUp(&currentLocation, fp);
 
 
+
+   }while(numEdges > 0);
 
 
 

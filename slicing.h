@@ -434,10 +434,9 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-   //(THIS IS THE POSSIBLE TOP LAYER) - IF AN EXTRA LAYER IS CLOSER TO REAL OBJECT HEIGHT THAN CURRENT LAYER HEIGHT
 
 
-   if(currentHeight > maxHeight){
+   if(currentHeight > maxHeight && ((currentHeight - maxHeight) < (maxHeight - (currentHeight - LAYER_HEIGHT)))){
 
       printf("\n\nFINAL CONDITIONAL LAYER\n\n");
 
@@ -446,7 +445,7 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-      //FIND ALL POINTS THAT LIE ON CURRENT LAYER
+      //FIND ALL POINTS THAT LIE ON TOP LAYER
       for(int i = 0; i < numTriangles; i++){
 
 

@@ -2,7 +2,7 @@
 //FILE//
 ////////
 
-#define STL_IN "cube.stl"
+#define STL_IN "cubex2.stl"
 #define GCODE_OUT "testGcode.gcode"
 
 #define OBJECT_X 20
@@ -61,11 +61,11 @@
 //RESOLUTION & WIDTH//
 //////////////////////
 
-#define LAYER_HEIGHT 0.6
+#define LAYER_HEIGHT 0.3
 
 #define PERIMETERS 3
 
-#define EXTRUSION_WIDTH_MULTIPLIER 1.0
+#define EXTRUSION_WIDTH  (LAYER_HEIGHT * 1.2)
 
 #define EXTERNAL_PERIMETER_WIDTH (LAYER_HEIGHT * 1.1)
 #define INTERNAL_PERIMETER_WIDTH (LAYER_HEIGHT * 1.05)
