@@ -358,6 +358,221 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
 
 
+
+
+
+
+
+//RETURNED POINTER MUST BE FREE'D
+//edgesPerLoop ARG POINTER MUST BE FREE'D
+
+struct edge* edgesToLoops(struct edge* layerEdges, int layerEdgesI, struct point currentPoint, int* edgesPerLoop, int* currentLoop){
+
+     
+   //FIND THE NEAREST EDGE TO CURRENT POSITION TO START PRINTING ON
+
+   // ##POSSIBLE ISSUE## WILL ONLY CHECK THE FIRST POINT OF THE EDGE ##POSSIBLE ISSUE##
+
+
+   float lowestDistance = -1;
+
+   int startEdge = 0;
+
+   for(int i = 0; i < layerEdgesI; i++){
+
+      if(pointDistance(layerEdges[i].p1, currentPoint) < lowestDistance || lowestDistance < 0){
+
+         lowestDistance = pointDistance(layerEdges[i].p1, currentPoint);
+
+         startEdge = i;
+
+      }
+
+   }
+
+
+
+   //MOVE TO NEAREST POINT ON THIS LAYER
+
+   currentPoint.X = layerEdges[startEdge].p1.X;
+   currentPoint.Y = layerEdges[startEdge].p1.Y;
+
+
+
+
+
+
+   /////////////////////////////
+   //SEPARATE EDGES INTO LOOPS//
+   /////////////////////////////
+
+   //List of loops which consist of lists of edges
+   //Max number of loops is the number of edges divided by 3 because a loop must be at least 3 edges
+   struct edge* loops = calloc(sizeof(struct edge),(layerEdgesI/3)*layerEdgesI);
+
+   edgesPerLoop = calloc(sizeof(int),layerEdgesI);
+   *currentLoop = 0;
+   int loopI = 0;
+
+
+   //List of used edges from layerEdges
+   int edgesUsed[layerEdgesI];
+
+   int numEdgesUsed = 0;
+
+
+
+
+
+   while(numEdgesUsed < layerEdgesI){
+      
+
+      int edgeAddedThisLoop = 0;
+
+      for(int i = 0; i < layerEdgesI; i++){
+
+
+         //CHECK IF CURRENTLY CONSIDERED EDGE IS ALREADY USED
+         int edgeIsUsed = 0;
+
+         for(int i2 = 0; i2 < numEdgesUsed; i2++){
+
+            if(i == edgesUsed[i2]){
+
+               edgeIsUsed = 1;
+            }
+
+         }
+
+
+
+         //CHECK IF EDGE STARTS WITH OUR CURRENT POINT - IF SO ADD TO LOOP
+         if(edgeIsUsed == 0 && layerEdges[i].p1.X == currentPoint.X && layerEdges[i].p1.Y == currentPoint.Y){
+
+            loops[((*currentLoop) * layerEdgesI/3) + edgesPerLoop[*currentLoop]] = layerEdges[i];
+            edgesPerLoop[*currentLoop]++;
+
+            edgesUsed[numEdgesUsed] = i;
+            numEdgesUsed++;
+
+            currentPoint.X = layerEdges[i].p2.X;
+            currentPoint.Y = layerEdges[i].p2.Y;
+
+
+            edgeAddedThisLoop = 1;
+
+         }
+
+
+      }
+
+
+      if(edgeAddedThisLoop == 0){
+         
+         (*currentLoop) += 1;
+
+
+
+
+     
+         //FIND THE NEAREST EDGE TO CURRENT POSITION TO START PRINTING ON
+
+         // ##POSSIBLE ISSUE## WILL ONLY CHECK THE FIRST POINT OF THE EDGE ##POSSIBLE ISSUE##
+
+
+         lowestDistance = -1;
+
+         startEdge = 0;
+
+         for(int i = 0; i < layerEdgesI; i++){
+
+
+
+            //CHECK IF CURRENTLY CONSIDERED EDGE IS ALREADY USED
+            int edgeIsUsed = 0;
+
+            for(int i2 = 0; i2 < numEdgesUsed; i2++){
+
+               if(i == edgesUsed[i2]){
+
+                  edgeIsUsed = 1;
+
+               }
+
+            }
+
+
+
+
+            if(edgeIsUsed == 0 && (pointDistance(layerEdges[i].p1, currentPoint) < lowestDistance || lowestDistance < 0)){
+
+               lowestDistance = pointDistance(layerEdges[i].p1, currentPoint);
+
+               startEdge = i;
+
+            }
+
+         }
+
+
+         currentPoint.X = layerEdges[startEdge].p1.X;
+         currentPoint.Y = layerEdges[startEdge].p1.Y;
+
+
+      }
+
+
+
+   }
+
+   //ONE EXTRA ITERATION TO currentLoop BECAUSE IT WILL MISS ONE IN ABOVE ALGORITHM
+
+         
+   (*currentLoop) += 1;
+
+
+
+
+   ////////////////////////////////////
+   //WRITE PERIMETER EDGES FROM LOOPS//
+   ////////////////////////////////////
+
+
+   for(int i = 0; i < (*currentLoop); i++){
+
+      for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
+
+         printf("LOOP: %d, EDGE: %d - %f, %f TO %f, %f\n",i,i2,loops[(i * layerEdgesI/3) + i2].p1.X,loops[(i * layerEdgesI/3) + i2].p1.Y,loops[(i * layerEdgesI/3) + i2].p2.X,loops[(i * layerEdgesI/3) + i2].p2.Y);
+
+      }
+
+   }
+
+
+
+
+   return loops;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//RETURNED POINTER MUST BE FREE'D
 struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight, int *numEdges){
 
 
@@ -692,16 +907,10 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-
-
       //CONVERT POINTS TO EDGES
 
 
       return pointsToEdges(layerPoints, layerPointsI, triangles, numTriangles, numEdges);
-
-
-
-
 
 
 
@@ -710,22 +919,18 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
