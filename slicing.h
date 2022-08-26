@@ -271,8 +271,7 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
       for(int i2 = 0; i2 < numTriangles; i2++){
 
-         if( !(triFacesUp(triangles[i2]) || triFacesDown(triangles[i2])) &&
-             pointIsOnTri(layerPoints[i], triangles[i2])    ||    (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2]))    ){
+         if( !(triFacesDown(triangles[i2]) || triFacesUp(triangles[i2])) && (pointIsOnTri(layerPoints[i], triangles[i2]) || (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2])))){
 
             for(int i3 = 0; i3 < layerPointsI; i3++){
 

@@ -109,7 +109,7 @@ float pointDistance(struct point p1, struct point p2){
 int triFacesUp(struct tri t){
 
    if(t.normal.X == 0 && t.normal.Y == 0 && t.normal.Z == 1){
-
+      
       return 1;
 
    }
@@ -125,7 +125,7 @@ int triFacesDown(struct tri t){
 
 
    if(t.normal.X == 0 && t.normal.Y == 0 && t.normal.Z == -1){
-
+      
       return 1;
 
    }
