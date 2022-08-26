@@ -80,10 +80,6 @@ int main(){
 
       struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, edgesPerLoop, &currentLoop);
 
-      printf("\nCURRENTLOOP: %d\n",currentLoop);
-
-      printf("\n%f, %f\n",loops[1].p2.X,loops[1].p2.Y);
-//      printf("MAIN: last loops val: %f, %f",loops[((currentLoop-1) * numEdges/3) + edgesPerLoop[currentLoop-1]-1].p2.X,loops[((currentLoop-1) * numEdges/3) + edgesPerLoop[currentLoop-1]-1].p2.Y);
 
       //writeLayerPerim(layerEdges, numEdges, &currentLocation, &currentExtrusion, fp);
 

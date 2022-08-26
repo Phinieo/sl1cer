@@ -408,11 +408,12 @@ struct edge* edgesToLoops(struct edge* layerEdges, int layerEdgesI, struct point
 
    //List of loops which consist of lists of edges
    //Max number of loops is the number of edges divided by 3 because a loop must be at least 3 edges
-   struct edge* loops = calloc(sizeof(struct edge),(layerEdgesI/3)*layerEdgesI);
+   struct edge* loops = (struct edge*)calloc(sizeof(struct edge),layerEdgesI*layerEdgesI);
 
    edgesPerLoop = calloc(sizeof(int),layerEdgesI);
    *currentLoop = 0;
    int loopI = 0;
+
 
 
    //List of used edges from layerEdges
@@ -426,7 +427,6 @@ struct edge* edgesToLoops(struct edge* layerEdges, int layerEdgesI, struct point
 
    while(numEdgesUsed < layerEdgesI){
       
-
       int edgeAddedThisLoop = 0;
 
       for(int i = 0; i < layerEdgesI; i++){
@@ -449,8 +449,15 @@ struct edge* edgesToLoops(struct edge* layerEdges, int layerEdgesI, struct point
          //CHECK IF EDGE STARTS WITH OUR CURRENT POINT - IF SO ADD TO LOOP
          if(edgeIsUsed == 0 && layerEdges[i].p1.X == currentPoint.X && layerEdges[i].p1.Y == currentPoint.Y){
 
-            loops[((*currentLoop) * layerEdgesI/3) + edgesPerLoop[*currentLoop]] = layerEdges[i];
-            edgesPerLoop[*currentLoop]++;
+
+            int temp =  ((*currentLoop) * layerEdgesI) + (edgesPerLoop[(*currentLoop)]);
+
+
+            loops[temp] = layerEdges[i];
+
+
+            edgesPerLoop[(*currentLoop)] += 1;
+
 
             edgesUsed[numEdgesUsed] = i;
             numEdgesUsed++;
@@ -537,12 +544,13 @@ struct edge* edgesToLoops(struct edge* layerEdges, int layerEdgesI, struct point
    //WRITE PERIMETER EDGES FROM LOOPS//
    ////////////////////////////////////
 
+   printf("\nEDGESPERLOOP[0]: %d\n",edgesPerLoop[0]);
 
    for(int i = 0; i < (*currentLoop); i++){
 
       for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
 
-         printf("LOOP: %d, EDGE: %d - %f, %f TO %f, %f\n",i,i2,loops[(i * layerEdgesI/3) + i2].p1.X,loops[(i * layerEdgesI/3) + i2].p1.Y,loops[(i * layerEdgesI/3) + i2].p2.X,loops[(i * layerEdgesI/3) + i2].p2.Y);
+         printf("LOOP: %d, EDGE: %d - %f, %f TO %f, %f\n",i,i2,loops[(i * layerEdgesI) + i2].p1.X, loops[(i * layerEdgesI) + i2].p1.Y, loops[(i * layerEdgesI) + i2].p2.X, loops[(i * layerEdgesI) + i2].p2.Y);
 
       }
 
