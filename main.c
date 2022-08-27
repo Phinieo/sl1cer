@@ -78,10 +78,9 @@ int main(){
       int currentLoop = 0;
 
 
-      struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, edgesPerLoop, &currentLoop);
+      struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
 
-
-      //writeLayerPerim(layerEdges, numEdges, &currentLocation, &currentExtrusion, fp);
+      writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
 
 
       layerUp(&currentLocation, fp);
@@ -89,6 +88,7 @@ int main(){
 
       free(layerEdges);
 
+      free(loops);
 
 
    }while(numEdges > 0);
