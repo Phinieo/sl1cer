@@ -35,13 +35,15 @@ int main(){
 
 
 
-   //UNDO EARLY EXTRUDER RETRACTION
-
-   fputs("G1 E2.00000 F2400.00000",fp);
-
-   fputs("\n\n",fp);
+   //UNDO EARLY EXTRUDER RETRACTION AND Z LIFT
 
    currentExtrusion += 2;
+
+   writeG1("F",(float[1]){TRAVEL_SPEED},fp);
+
+   writeG1("E",(float[1]){currentExtrusion},fp);
+
+   writeG1("Z",(float[1]){currentLocation.Z},fp);
 
 
 

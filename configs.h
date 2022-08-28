@@ -2,7 +2,7 @@
 //FILE//
 ////////
 
-#define STL_IN "cubex2.stl"
+#define STL_IN "gombic.stl"
 #define GCODE_OUT "testGcode.gcode"
 
 #define OBJECT_X 20
@@ -73,6 +73,8 @@
 #define PERIMETER_OVERLAP 0.1075
 
 
+
+#define RETRACTION_DISTANCE 2.0
 
 
 
