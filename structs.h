@@ -135,6 +135,63 @@ struct point computeNormal(struct tri Triangle){
 
    struct point temp;
 
+
+   struct point zero;
+   zero.X = 0;
+   zero.Y = 0;
+   zero.Z = 0;
+
+
+
+   struct point BminusA;
+
+   BminusA.X = Triangle.p3.X - Triangle.p1.X;
+   BminusA.Y = Triangle.p3.Y - Triangle.p1.Y;
+   BminusA.Z = Triangle.p3.Z - Triangle.p1.Z;
+
+
+
+   struct point BminusC;
+
+   BminusC.X = Triangle.p2.X - Triangle.p1.X;
+   BminusC.Y = Triangle.p2.Y - Triangle.p1.Y;
+   BminusC.Z = Triangle.p2.Z - Triangle.p1.Z;
+
+
+
+
+   temp.X = (BminusA.Z * BminusC.Y) - (BminusA.Y * BminusC.Z);
+   temp.Y = (BminusA.X * BminusC.Z) - (BminusA.Z * BminusC.X);
+   temp.Z = (BminusA.Y * BminusC.X) - (BminusA.X * BminusC.Y);
+
+
+   float magnitude = pointDistance(zero, temp);
+
+   temp.X = temp.X / magnitude == 0 ? 0 : temp.X / magnitude;
+
+   temp.Y = temp.Y / magnitude == 0 ? 0 : temp.Y / magnitude;
+
+   temp.Z = temp.Z / magnitude == 0 ? 0 : temp.Z / magnitude;
+
+
+
+   return temp;
+
+}
+
+
+
+
+
+
+
+//This generates normals but they are inverted
+
+/*
+struct point computeNormal(struct tri Triangle){
+
+   struct point temp;
+
    struct point zero;
    zero.X = 0;
    zero.Y = 0;
@@ -186,11 +243,6 @@ struct point computeNormal(struct tri Triangle){
 
 }
 
-
-
-
-
-
-
+*/
 
 
