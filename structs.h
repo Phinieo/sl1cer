@@ -30,13 +30,6 @@ struct tri{
 
 
 
-
-
-
-
-
-
-
 struct point centerPoint(struct point p){
 
    struct point temp;
@@ -85,17 +78,16 @@ struct edge centerEdge(struct edge e){
 //RETURNS DISTANCE BETWEEN TWO POINTS ON THE XY PLANE
 float pointDistance(struct point p1, struct point p2){
 
-   float dist = 0;
-
-
 
    float dX = p1.X - p2.X;
    float dY = p1.Y - p2.Y;
+   float dZ = p1.Z - p2.Z;
 
    dX = dX*dX;
    dY = dY*dY;
+   dZ = dZ*dZ;
 
-   dX = dX+dY;
+   dX = dX+dY+dZ;
    dX = sqrt(dX);
 
 
@@ -133,6 +125,64 @@ int triFacesDown(struct tri t){
 
 
    return 0;
+
+}
+
+
+
+
+struct point computeNormal(struct tri Triangle){
+
+   struct point temp;
+
+   struct point zero;
+   zero.X = 0;
+   zero.Y = 0;
+   zero.Z = 0;
+
+
+   //Dir = (B - A) x (C - A)
+   //Norm = Dir / len(Dir)
+
+
+   struct point BminusA;
+
+   BminusA.X = Triangle.p2.X - Triangle.p1.X;
+   BminusA.Y = Triangle.p2.Y - Triangle.p1.Y;
+   BminusA.Z = Triangle.p2.Z - Triangle.p1.Z;
+
+
+
+   struct point BminusC;
+
+   BminusC.X = Triangle.p2.X - Triangle.p3.X;
+   BminusC.Y = Triangle.p2.Y - Triangle.p3.Y;
+   BminusC.Z = Triangle.p2.Z - Triangle.p3.Z;
+
+
+   //cx = aybz − azby
+   //cy = azbx − axbz
+   //cz = axby − aybx
+
+
+
+   temp.X = (BminusA.Y * BminusC.Z) - (BminusA.Z * BminusC.Y);
+   temp.Y = (BminusA.Z * BminusC.X) - (BminusA.X * BminusC.Z);
+   temp.Z = (BminusA.X * BminusC.Y) - (BminusA.Y * BminusC.X);
+
+
+   float magnitude = pointDistance(zero, temp);
+
+   temp.X = temp.X / magnitude;
+
+   temp.Y = temp.Y / magnitude;
+
+   temp.Z = temp.Z / magnitude;
+
+
+
+
+   return temp;
 
 }
 
