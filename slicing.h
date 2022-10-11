@@ -315,6 +315,9 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
                      layerEdges[*layerEdgesI].p1 = layerPoints[i];
                      layerEdges[*layerEdgesI].p2 = layerPoints[i3];
+
+                     layerEdges[*layerEdgesI].normal = normal3Dto2D(triangles[i2].normal);
+
                      printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI].p1.X,layerEdges[*layerEdgesI].p1.Y,layerEdges[*layerEdgesI].p2.X,layerEdges[*layerEdgesI].p2.Y);
                      
                      *layerEdgesI = *layerEdgesI + 1;
@@ -353,10 +356,145 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
 
 
+struct edge scaleEdgeInwards(struct edge bigEdge){
+
+   struct edge smallEdge = bigEdge;
+
+   smallEdge.p1.X = smallEdge.p1.X + (smallEdge.normal.X * EXTRUSION_WIDTH * -1);
+   smallEdge.p1.Y = smallEdge.p1.Y + (smallEdge.normal.Y * EXTRUSION_WIDTH * -1);
+
+
+   smallEdge.p2.X = smallEdge.p2.X + (smallEdge.normal.X * EXTRUSION_WIDTH * -1);
+   smallEdge.p2.Y = smallEdge.p2.Y + (smallEdge.normal.Y * EXTRUSION_WIDTH * -1);
+
+
+   printf("\nINPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",bigEdge.p1.X,bigEdge.p1.Y,bigEdge.p2.X,bigEdge.p2.Y,bigEdge.normal.X,bigEdge.normal.Y,bigEdge.normal.Z);
+
+   printf("\nOUTPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",smallEdge.p1.X,smallEdge.p1.Y,smallEdge.p2.X,smallEdge.p2.Y,smallEdge.normal.X,smallEdge.normal.Y,smallEdge.normal.Z);
+
+
+
+   return smallEdge;
+
+}
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+struct edge* shrinkLoops(struct edge* layerEdges, int layerEdgesI, int* edgesPerLoop, int numLoops){
+
+ 
+
+   struct edge* newLoops = (struct edge*)calloc(sizeof(struct edge),layerEdgesI*layerEdgesI);
+
+
+      //SHRINK ALL LOOPS
+      for(int i = 0; i < numLoops; i++){
+
+         for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
+
+            newLoops[i * layerEdgesI + i2] = scaleEdgeInwards(layerEdges[i * layerEdgesI + i2]);
+
+         }
+
+      }
+/*
+      printf("ALL LOOP SHRINKING FINSISHED. FINDING NEW INTERSECTIONS\n");
+
+      //FIND NEW INTERSECTIONS
+      for(int i = 0; i < numLoops; i++){
+      
+         for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
+
+           printf("Loop - i: %d, i2: %d\n",i,i2);
+
+
+           int edge1Index = i * layerEdgesI + i2;
+           int edge2Index = i * layerEdgesI + ((edgesPerLoop[i] - 1 + i2)%edgesPerLoop[i]);
+
+           struct point temp = intersection(newLoops[edge1Index], newLoops[edge2Index]);
+
+           printf("EDGE1: %f, %f ---- %f, %f\n",newLoops[edge1Index].p1.X,newLoops[edge1Index].p1.Y,newLoops[edge1Index].p2.X,newLoops[edge1Index].p2.Y);
+           printf("EDGE2: %f, %f ---- %f, %f\n",newLoops[edge2Index].p1.X,newLoops[edge2Index].p1.Y,newLoops[edge2Index].p2.X,newLoops[edge2Index].p2.Y);
+
+
+           //IF THERE IS NO INTERSECTION BETWEEN EDGE I and I+1
+           if(temp.X == FLT_MAX && temp.Y == FLT_MAX){
+
+              printf("\n\nNO INTERSECTION ERROR!!! BIG BAD\n\n");
+
+              temp.X = 0.0;
+              temp.Y = 0.0;
+
+           }
+
+
+           //IF POINT 1 CONNECTS TO POINT 1 OF THE NEXT EDGE
+           if(layerEdges[edge1Index].p1.X == layerEdges[edge2Index].p1.X && layerEdges[edge1Index].p1.Y == layerEdges[edge2Index].p1.Y){
+
+              layerEdges[edge1Index].p1 = temp;
+              layerEdges[edge2Index].p1 = temp;
+              continue;
+
+           }
+
+           //IF POINT 1 CONNECTS TO POINT 2 OF THE NEXT EDGE
+           if(layerEdges[edge1Index].p1.X == layerEdges[edge2Index].p2.X && layerEdges[edge1Index].p1.Y == layerEdges[edge2Index].p2.Y){
+
+              layerEdges[edge1Index].p1 = temp;
+              layerEdges[edge2Index].p2 = temp;
+              continue;
+
+           }
+
+
+           //IF POINT 2 CONNECTS TO POINT 1 OF THE NEXT EDGE
+           if(layerEdges[edge1Index].p2.X == layerEdges[edge2Index].p1.X && layerEdges[edge1Index].p2.Y == layerEdges[edge2Index].p1.Y){
+
+              layerEdges[edge1Index].p2 = temp;
+              layerEdges[edge2Index].p1 = temp;
+              continue;
+
+           }
+
+
+           //IF POINT 2 CONNECTS TO POINT 2 OF THE NEXT EDGE
+           if(layerEdges[edge1Index].p2.X == layerEdges[edge2Index].p2.X && layerEdges[edge1Index].p2.Y == layerEdges[edge2Index].p2.Y){
+
+              layerEdges[edge1Index].p2 = temp;
+              layerEdges[edge2Index].p2 = temp;
+              continue;
+
+           }
+
+
+
+
+
+
+
+         }
+
+      }
+
+
+*/
+   return newLoops;
+  
+
+}
 
 
 

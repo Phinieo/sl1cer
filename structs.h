@@ -13,6 +13,8 @@ struct edge{
    struct point p1;
    struct point p2;
 
+   struct point normal;
+
 };
 
 
@@ -30,50 +32,6 @@ struct tri{
 
 
 
-struct point centerPoint(struct point p){
-
-   struct point temp;
-
-
-   temp.X = p.X + (MAX_X/2);
-   temp.Y = p.Y + (MAX_Y/2);
-   temp.Z = p.Z;
-
-
-   return temp;
-
-}
-
-
-
-
-
-struct tri centerTriangle(struct tri t){
-
-   struct tri temp;
-
-   temp.p1 = centerPoint(t.p1);
-   temp.p2 = centerPoint(t.p2);
-   temp.p3 = centerPoint(t.p3);
-
-
-   return temp;
-
-}
-
-
-
-
-struct edge centerEdge(struct edge e){
-
-   struct edge temp;
-
-   temp.p1 = centerPoint(e.p1);
-   temp.p2 = centerPoint(e.p2);
-
-   return temp;
-
-}
 
 //RETURNS DISTANCE BETWEEN TWO POINTS ON THE XY PLANE
 float pointDistance(struct point p1, struct point p2){
@@ -182,6 +140,75 @@ struct point computeNormal(struct tri Triangle){
 
 
 
+
+
+struct point normal3Dto2D(struct point normal3D){
+
+   struct point zero;
+   zero.X = 0;
+   zero.Y = 0;
+   zero.Z = 0;
+
+
+   struct point normal2D;
+
+   normal2D.X = normal3D.X;
+   normal2D.Y = normal3D.Y;
+   normal2D.Z = 0.0;
+
+
+   float magnitude = pointDistance(zero, normal2D);
+
+
+   normal2D.X = normal2D.X / magnitude == 0 ? 0 : normal2D.X / magnitude;
+
+   normal2D.Y = normal2D.Y / magnitude == 0 ? 0 : normal2D.Y / magnitude;
+
+
+   return normal2D;
+
+
+}
+
+
+
+struct point intersection(struct edge edge1, struct edge edge2){
+
+   struct point intersectPoint;
+
+
+
+   float t = ((edge1.p1.X - edge2.p1.X) * (edge2.p1.Y - edge2.p2.Y)) - ((edge1.p1.Y - edge2.p1.Y) * (edge2.p1.X - edge2.p2.X));
+
+   t = t / (((edge1.p1.X - edge1.p2.X) * (edge2.p1.Y - edge2.p2.Y)) - ((edge1.p1.Y - edge1.p2.Y) * (edge2.p1.X - edge2.p2.X)));
+
+
+
+   float u = ((edge1.p1.X - edge2.p1.X) * (edge1.p1.Y - edge1.p2.Y)) - ((edge1.p1.Y - edge2.p1.Y) * (edge1.p1.X - edge1.p2.X));
+
+   u = u / (((edge1.p1.X - edge1.p2.X) * (edge2.p1.Y - edge2.p2.Y)) - ((edge1.p1.Y - edge1.p2.Y) * (edge2.p1.X - edge2.p2.X)));
+
+
+
+   if(t >= 0 && t <= 1 && u >= 0 && u <= 1){
+
+      intersectPoint.X = edge1.p1.X + ( t * (edge1.p2.X - edge1.p1.X));
+      intersectPoint.Y = edge1.p1.Y + ( t * (edge1.p2.X - edge1.p1.X));
+
+   }else{
+
+      intersectPoint.X = FLT_MAX;
+      intersectPoint.Y = FLT_MAX;
+
+   }
+
+
+
+
+
+   return intersectPoint;
+
+}
 
 
 

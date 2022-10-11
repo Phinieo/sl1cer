@@ -71,6 +71,67 @@ void writeStart(FILE *fp){
 
 
 
+
+
+
+
+
+
+struct point centerPoint(struct point p){
+
+   struct point temp;
+
+
+   temp.X = p.X + (MAX_X/2);
+   temp.Y = p.Y + (MAX_Y/2);
+   temp.Z = p.Z;
+
+
+   return temp;
+
+}
+
+
+
+
+struct tri centerTriangle(struct tri t){
+
+   struct tri temp;
+
+   temp.p1 = centerPoint(t.p1);
+   temp.p2 = centerPoint(t.p2);
+   temp.p3 = centerPoint(t.p3);
+
+   temp.normal = t.normal;
+
+
+   return temp;
+
+}
+
+
+
+
+struct edge centerEdge(struct edge e){
+
+   struct edge temp;
+
+   temp.p1 = centerPoint(e.p1);
+   temp.p2 = centerPoint(e.p2);
+
+   temp.normal = e.normal;
+
+   return temp;
+
+}
+
+
+
+
+
+
+
+
 void layerUp(struct point* currentPoint, FILE *fp){
 
    (*currentPoint).Z += LAYER_HEIGHT;
@@ -111,9 +172,14 @@ void endRetract(float* currentExtrusion, FILE *fp){
 
 
 
-void writeLayerPerim(struct edge* loops, int numEdges, int* edgesPerLoop, int numLoops, struct point* currentPoint, float* currentExtrusion, FILE *fp){
+void writeLayerPerim(struct edge* loopsIN, int numEdges, int* edgesPerLoop, int numLoops, struct point* currentPoint, float* currentExtrusion, FILE *fp){
 
 
+
+
+
+   //MAKE NEW ARRAY SO AS TO NOT CHANGE INPUT LOOP ARRAY
+   struct edge* loops = (struct edge*)calloc(sizeof(struct edge),numEdges*numEdges);
 
 
 
@@ -123,12 +189,15 @@ void writeLayerPerim(struct edge* loops, int numEdges, int* edgesPerLoop, int nu
 
       for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
 
-         loops[i * numEdges + i2] = centerEdge(loops[i * numEdges + i2]);
+
+         loops[i * numEdges + i2] = centerEdge(loopsIN[i * numEdges + i2]);
 
 
       }
 
    }
+
+
 
 
 
@@ -222,8 +291,6 @@ void writeLayerPerim(struct edge* loops, int numEdges, int* edgesPerLoop, int nu
 
                writeG1("XYE", (float[3]){loops[i * numEdges + i3].p2.X, loops[i * numEdges + i3].p2.Y, (*currentExtrusion)}, fp);
 
-               printf("WROTE LINE!\n");
-
                (*currentPoint).X = loops[i * numEdges + i3].p2.X;
                (*currentPoint).Y = loops[i * numEdges + i3].p2.Y;
 
@@ -297,7 +364,8 @@ void writeLayerPerim(struct edge* loops, int numEdges, int* edgesPerLoop, int nu
    startRetract(currentExtrusion, fp);
 
 
-   printf("FINISHED LAYER\n\n");
+   free(loops);
+
 
    return;
 

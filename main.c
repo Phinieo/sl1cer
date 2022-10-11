@@ -82,7 +82,29 @@ int main(){
 
       struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
 
+
       writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
+
+
+
+
+
+      for(int i = 0; i < PERIMETERS - 1; i++){
+
+         printf("INTERIOR PERIMETER; %d\n",i);
+
+         struct edge* temp = shrinkLoops(loops, numEdges, edgesPerLoop, currentLoop);
+
+         free(loops);
+
+         loops = temp;
+
+
+         writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
+
+
+
+      }
 
 
       layerUp(&currentLocation, fp);
