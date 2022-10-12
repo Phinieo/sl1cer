@@ -25,6 +25,10 @@ struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
 }
 
 
+
+
+
+
 //pointIsOnTri FUNCTION BUT ONLY FOR THE LAST CONDITIONAL LAYER
 int pointIsAboveTri(struct point p, struct tri triangle){
 
@@ -57,6 +61,12 @@ int pointIsAboveTri(struct point p, struct tri triangle){
    return 0;
 
 }
+
+
+
+
+
+
 
 
 
@@ -225,6 +235,66 @@ int addUniquePoint(struct point p, struct point* points, int* numPoints){
 
 
 
+//ADDS EDGE TO LIST IF IT IS NOT CURRENTLY IN LIST
+int addUniqueEdge(struct edge e, struct edge* edges, int* numEdges){
+
+
+   for(int i = 0; i < *numEdges; i++){
+
+      //CHECK FOR EXACT EDGE MATCH
+      if(e.p1.X == edges[i].p1.X && e.p1.Y == edges[i].p1.Y){
+
+         if(e.p2.X == edges[i].p2.X && e.p2.Y == edges[i].p2.Y){
+
+
+            return 0;
+
+
+         }
+
+
+      }
+
+
+
+      //CHECK FOR REVERSE EDGE MATCH
+      if(e.p1.X == edges[i].p2.X && e.p1.Y == edges[i].p2.Y){
+
+         if(e.p2.X == edges[i].p1.X && e.p2.Y == edges[i].p1.Y){
+
+            return 0;
+
+
+         }
+
+
+      }
+
+
+
+   }
+
+
+   edges[*numEdges] = e;
+
+   *numEdges = *numEdges + 1;
+
+
+   return 1;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
 //RETURNED POINTER MUST BE FREE'D
 struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct tri* triangles, int numTriangles, int* layerEdgesI){
 
@@ -267,72 +337,84 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
    *layerEdgesI = 0;
 
-   for(int i = 0; i < layerPointsI; i++){
-
-      for(int i2 = 0; i2 < numTriangles; i2++){
-
-         if( !(triFacesDown(triangles[i2]) || triFacesUp(triangles[i2])) && (pointIsOnTri(layerPoints[i], triangles[i2]) || (layerPoints[i].Z > maxHeight && pointIsAboveTri(layerPoints[i], triangles[i2])))){
-
-            for(int i3 = 0; i3 < layerPointsI; i3++){
-
-               if(   i3 != i && 
-                   (pointIsOnTri(layerPoints[i3], triangles[i2])     ||      (layerPoints[i3].Z > maxHeight && pointIsAboveTri(layerPoints[i3], triangles[i2])))     ){
-
-                  //CHECK TO SEE IF FIRST EDGE POINT IS ALREADY A FIRST EDGE POINT TO AVOID DUPLICATE LOOP
-                     
-                  int isInEdgeList = 0;
-                  for(int i4 = 0; i4 < *layerEdgesI; i4++){
-
-                     //DO NOT ADD IF ANY PREVIOUS EDGES HAVE THE SAME STARTING POINT AS CURRENT
-                     if(layerEdges[i4].p1.X == layerPoints[i].X && layerEdges[i4].p1.Y == layerPoints[i].Y){
 
 
-                        isInEdgeList = 1;
+   //COMPARE EACH POINT TO EACH OTHER POINT
+   for(int p1 = 0; p1 < layerPointsI; p1++){
 
-                     
-                     }
-
-                     //DO NOT ADD IF THE CURRENT EDGE IS REVERSE OF ANY PREVIOUS EDGES
-
-                     if(layerEdges[i4].p2.X == layerPoints[i].X && layerEdges[i4].p2.Y == layerPoints[i].Y){
+      for(int p2 = 0; p2 < layerPointsI; p2++){
 
 
-                        if(layerEdges[i4].p1.X == layerPoints[i3].X && layerEdges[i4].p1.Y == layerPoints[i3].Y){
+         //DO NOT COMPARE A POINT TO ITSELF
+         if(p1 != p2){
 
-                           isInEdgeList = 1; 
-
-                        }
-
-                     }
+            //CHECK POINTS TO EACH TRIANGLE
+            for(int t = 0; t < numTriangles; t++){
 
 
+               //SKIP UP OR DOWN FACING TRIANGLES
+               if(triFacesUp(triangles[t]) || triFacesDown(triangles[t])){
 
+                  continue;
 
-                  }
-                     
-                  //ADD EDGE IF ALL CHECKS ARE GOOD
-                  if(!isInEdgeList){
+               }
 
-                     layerEdges[*layerEdgesI].p1 = layerPoints[i];
-                     layerEdges[*layerEdgesI].p2 = layerPoints[i3];
+               //IF POINTS LIE ON THE SAME TRIANGLE ADD THEM TO THE LIST OF UNIQUE EDGES
+               if(pointIsOnTri(layerPoints[p1],triangles[t]) && pointIsOnTri(layerPoints[p2],triangles[t])){
 
-                     layerEdges[*layerEdgesI].normal = normal3Dto2D(triangles[i2].normal);
+                  struct edge tempEdge;
+                  tempEdge.p1.X = layerPoints[p1].X;
+                  tempEdge.p1.Y = layerPoints[p1].Y;
 
-                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI].p1.X,layerEdges[*layerEdgesI].p1.Y,layerEdges[*layerEdgesI].p2.X,layerEdges[*layerEdgesI].p2.Y);
-                     
-                     *layerEdgesI = *layerEdgesI + 1;
-                  
+                  tempEdge.p2.X = layerPoints[p2].X;
+                  tempEdge.p2.Y = layerPoints[p2].Y;
+
+                  tempEdge.normal = normal3Dto2D(triangles[t].normal);
+
+                  //PREVENTS IDENTICAL OR REVERSED EDGES
+                  if(addUniqueEdge(tempEdge,layerEdges,layerEdgesI)){
+
+                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
+ 
                   }
 
                }
 
+               //IF ABOVE MAX HEIGHT AND POINTS LIE ABOVE THE SAME TRIANGLE ADD THEM TO THE LIST OF UNIQUE EDGES
+               if(layerPoints[p1].Z > maxHeight && (pointIsAboveTri(layerPoints[p1],triangles[t]) && pointIsAboveTri(layerPoints[p2],triangles[t]))){
+
+                  struct edge tempEdge;
+                  tempEdge.p1.X = layerPoints[p1].X;
+                  tempEdge.p1.Y = layerPoints[p1].Y;
+
+                  tempEdge.p2.X = layerPoints[p2].X;
+                  tempEdge.p2.Y = layerPoints[p2].Y;
+
+                  tempEdge.normal = normal3Dto2D(triangles[t].normal);
+
+                  //PREVENTS IDENTICAL OR REVERSED EDGES
+                  if(addUniqueEdge(tempEdge,layerEdges,layerEdgesI)){
+
+                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
+ 
+                  }
+
+               }
+
+            
+
             }
 
+
+
          }
+
+
 
       }
 
    }
+
 
 
    printf("\n\nEDGES: %d\n\n",*layerEdgesI);

@@ -1,13 +1,13 @@
 
 //RETURNED POINTER MUST BE FREE'D
-struct tri* readSTL(char* filename, int* numTriangles){
+struct tri* readSTL(char* filename, unsigned int* numTriangles){
 
    FILE* fp;
 
    char wordIn = '\0'; 
 
 
-   fp = fopen(filename, "r");
+   fp = fopen(filename, "rb");
 
 
 
@@ -24,7 +24,7 @@ struct tri* readSTL(char* filename, int* numTriangles){
    //READ 4 BYTE NUMBER OF TRIANGLES
    fread(numTriangles, sizeof(char), 4, fp);
 
-
+   printf("\n\n\n\n%d TRIANGLES\n\n\n\n\n",*numTriangles);
 
 
    //READ ALL TRIANGLES

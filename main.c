@@ -61,9 +61,38 @@ int main(){
 
 
 
-   int numTriangles = 0;
+   unsigned int numTriangles = 0;
 
    struct tri* triangles = readSTL(STL_IN, &numTriangles);
+
+
+
+
+
+
+
+   int numVertices = 0;
+
+   struct point* verticeList = calloc(numTriangles*3, sizeof(struct point));
+
+
+   for(int i = 0; i < numTriangles; i++){
+
+
+      addUniquePoint(triangles[i].p1, verticeList,&numVertices);
+
+      addUniquePoint(triangles[i].p2, verticeList,&numVertices);
+
+      addUniquePoint(triangles[i].p3, verticeList,&numVertices);
+
+
+
+   }
+
+   free(verticeList);
+
+   printf("\n\n\n\n\n\n%d UNIQUE VERTICES\n\n\n\n\n\n",numVertices);
+
 
 
 
@@ -88,7 +117,7 @@ int main(){
 
 
 
-
+/*
       for(int i = 0; i < PERIMETERS - 1; i++){
 
          printf("INTERIOR PERIMETER; %d\n",i);
@@ -105,7 +134,7 @@ int main(){
 
 
       }
-
+*/
 
       layerUp(&currentLocation, fp);
 
