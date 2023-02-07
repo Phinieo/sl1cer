@@ -1,11 +1,11 @@
-#include "libs.h"
+#include "libs/libs.h"
 #include "configs.h"
 
-#include "structs.h"
-#include "readSTL.h"
-#include "slicing.h"
-#include "extrusion.h"
-#include "gcode.h"
+#include "libs/structs.h"
+#include "libs/readSTL.h"
+#include "libs/slicing.h"
+#include "libs/extrusion.h"
+#include "libs/gcode.h"
 
 
 

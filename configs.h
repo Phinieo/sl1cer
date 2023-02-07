@@ -2,7 +2,7 @@
 //FILE//
 ////////
 
-#define STL_IN "cube.stl"
+#define STL_IN "testSTLs/cube.stl"
 #define GCODE_OUT "testGcode.gcode"
 
 #define OBJECT_X 20
