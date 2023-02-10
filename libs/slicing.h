@@ -365,9 +365,11 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
                   struct edge tempEdge;
                   tempEdge.p1.X = layerPoints[p1].X;
                   tempEdge.p1.Y = layerPoints[p1].Y;
+                  tempEdge.p1.Z = layerPoints[p1].Z;
 
                   tempEdge.p2.X = layerPoints[p2].X;
                   tempEdge.p2.Y = layerPoints[p2].Y;
+                  tempEdge.p2.Z = layerPoints[p2].Z;
 
                   tempEdge.normal = normal3Dto2D(triangles[t].normal);
 
@@ -386,9 +388,11 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
                   struct edge tempEdge;
                   tempEdge.p1.X = layerPoints[p1].X;
                   tempEdge.p1.Y = layerPoints[p1].Y;
+                  tempEdge.p1.Z = layerPoints[p1].Z;
 
                   tempEdge.p2.X = layerPoints[p2].X;
                   tempEdge.p2.Y = layerPoints[p2].Y;
+                  tempEdge.p2.Z = layerPoints[p2].Z;
 
                   tempEdge.normal = normal3Dto2D(triangles[t].normal);
 
