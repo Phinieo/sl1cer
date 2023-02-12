@@ -1,24 +1,39 @@
 
 
 
-//p2 MUST BE HIGHER Z THAN p1
+//DOES NOT COVER EDGE CASE IN WHICH p1 == p2
 //p1 AND p2 MUST BE INTERSECTED BY sliceHeight
 struct point intersectLine(float sliceHeight, struct point p1, struct point p2){
 
-   float dX = p2.X - p1.X;
-   float dY = p2.Y - p1.Y;
-   float dZ = p2.Z - p1.Z;
-
-   float percent = (sliceHeight - p1.Z) / dZ;
-
-   float X = (dX * percent) + p1.X;
-   float Y = (dY * percent) + p1.Y;
-   float Z = sliceHeight;
 
    struct point intersectionPoint;
-   intersectionPoint.X = X;
-   intersectionPoint.Y = Y;
-   intersectionPoint.Z = Z;
+
+   if(p2.Z > p1.Z){
+
+      float dX = p2.X - p1.X;
+      float dY = p2.Y - p1.Y;
+      float dZ = p2.Z - p1.Z;
+
+      float percent = (sliceHeight - p1.Z) / dZ;
+
+      intersectionPoint.X = (dX * percent) + p1.X;
+      intersectionPoint.Y = (dY * percent) + p1.Y;
+      intersectionPoint.Z = sliceHeight;
+
+   }else{
+
+      float dX = p1.X - p2.X;
+      float dY = p1.Y - p2.Y;
+      float dZ = p1.Z - p2.Z;
+
+      float percent = (sliceHeight - p2.Z) / dZ;
+
+      intersectionPoint.X = (dX * percent) + p2.X;
+      intersectionPoint.Y = (dY * percent) + p2.Y;
+      intersectionPoint.Z = sliceHeight;
+      
+   }
+
 
    return intersectionPoint;
 
@@ -35,21 +50,21 @@ int pointIsAboveTri(struct point p, struct tri triangle){
 
    //IF POINT IS AN EXACT POINT OF THE TRIANGLE EXCEPT FOR Z
 
-   if(triangle.p1.X == p.X && triangle.p1.Y == p.Y && triangle.p1.Z < p.Z){
+   if(floatIsEqual(triangle.p1.X, p.X) && floatIsEqual(triangle.p1.Y, p.Y) && triangle.p1.Z < p.Z){
 
       return 1;
 
    }
 
 
-   if(triangle.p2.X == p.X && triangle.p2.Y == p.Y && triangle.p2.Z < p.Z){
+   if(floatIsEqual(triangle.p2.X, p.X) && floatIsEqual(triangle.p2.Y, p.Y) && triangle.p2.Z < p.Z){
 
       return 1;
 
    }
 
 
-   if(triangle.p3.X == p.X && triangle.p3.Y == p.Y && triangle.p3.Z < p.Z){
+   if(floatIsEqual(triangle.p3.X, p.X) && floatIsEqual(triangle.p3.Y, p.Y) && triangle.p3.Z < p.Z){
 
       return 1;
 
@@ -75,21 +90,21 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
    //IF POINT IS AN EXACT POINT OF THE TRIANGLE
 
-   if(triangle.p1.X == p.X && triangle.p1.Y == p.Y && triangle.p1.Z == p.Z){
+   if(floatIsEqual(triangle.p1.X, p.X) && floatIsEqual(triangle.p1.Y, p.Y) && floatIsEqual(triangle.p1.Z, p.Z)){
 
       return 1;
 
    }
 
 
-   if(triangle.p2.X == p.X && triangle.p2.Y == p.Y && triangle.p2.Z == p.Z){
+   if(floatIsEqual(triangle.p2.X, p.X) && floatIsEqual(triangle.p2.Y, p.Y) && floatIsEqual(triangle.p2.Z, p.Z)){
 
       return 1;
 
    }
 
 
-   if(triangle.p3.X == p.X && triangle.p3.Y == p.Y && triangle.p3.Z == p.Z){
+   if(floatIsEqual(triangle.p3.X, p.X) && floatIsEqual(triangle.p3.Y, p.Y) && floatIsEqual(triangle.p3.Z, p.Z)){
 
       return 1;
 
@@ -107,7 +122,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p1, triangle.p2);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
             return 1; 
 
@@ -118,7 +133,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p2, triangle.p1);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
            return 1; 
 
@@ -139,7 +154,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p2, triangle.p3);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
             return 1; 
 
@@ -150,7 +165,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p3, triangle.p2);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
            return 1; 
 
@@ -168,7 +183,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p3, triangle.p1);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
             return 1; 
 
@@ -179,7 +194,7 @@ int pointIsOnTri(struct point p, struct tri triangle){
 
          struct point temp = intersectLine(p.Z, triangle.p1, triangle.p3);
 
-         if(temp.X == p.X && temp.Y == p.Y){
+         if(floatIsEqual(temp.X, p.X) && floatIsEqual(temp.Y, p.Y)){
 
            return 1; 
 
@@ -188,11 +203,6 @@ int pointIsOnTri(struct point p, struct tri triangle){
       }
 
    }
-
-
-
-
-
 
 
 
@@ -208,7 +218,7 @@ int addUniquePoint(struct point p, struct point* points, int* numPoints){
 
    for(int i = 0; i < *numPoints; i++){
 
-      if(p.X == points[i].X && p.Y == points[i].Y && p.Z == points[i].Z){
+      if(floatIsEqual(p.X, points[i].X) && floatIsEqual(p.Y, points[i].Y) && floatIsEqual(p.Z, points[i].Z)){
 
          return 0;
 

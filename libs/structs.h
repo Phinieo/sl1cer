@@ -1,3 +1,5 @@
+#define FLOAT_ERROR 0.0000000000000001
+
 
 struct point{
 
@@ -30,6 +32,19 @@ struct tri{
 };
 
 
+//USED TO COMPARE TWO FLOAT VALUES
+//PREVENTS ISSUES DUE TO FLOATING POINT MATH WEIRDNESS
+int floatIsEqual(float f1, float f2){
+
+   if(fabs(f1 - f2) < FLOAT_ERROR){
+
+      return 1;
+
+   }
+
+   return 0;
+
+}
 
 
 
