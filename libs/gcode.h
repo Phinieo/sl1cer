@@ -189,9 +189,7 @@ void writeLayerPerim(struct edge* loopsIN, int numEdges, int* edgesPerLoop, int 
 
       for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
 
-
          loops[i * numEdges + i2] = centerEdge(loopsIN[i * numEdges + i2]);
-
 
       }
 
@@ -286,6 +284,8 @@ void writeLayerPerim(struct edge* loopsIN, int numEdges, int* edgesPerLoop, int 
 
 
             if((*currentPoint).X == loops[i * numEdges + i3].p1.X && (*currentPoint).Y == loops[i * numEdges + i3].p1.Y){
+
+               
 
                (*currentExtrusion) += perimeterExtrusion(pointDistance(loops[i * numEdges + i3].p1, loops[i * numEdges + i3].p2));
 
