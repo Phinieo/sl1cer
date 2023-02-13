@@ -104,15 +104,24 @@ int main(){
       struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
 
 
-      int* edgesPerLoop;
+      printf("\n\n\n\n\n\nNUMBER OF LOOPS: %d\n\n\n\n\n\n",countLoops(layerEdges, numEdges));
 
-      int currentLoop = 0;
+      //Get Number of loop in layerEdges
+
+      //for each loop, starting from the clostest starting point, assemble the loop and generate Gcode
 
 
-      struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
 
 
-      writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
+      //int* edgesPerLoop;
+
+      //int currentLoop = 0;
+
+
+      //struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
+
+
+      //writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
 
 
 
@@ -141,7 +150,7 @@ int main(){
 
       free(layerEdges);
 
-      free(loops);
+      //free(loops);
 
 
    }while(numEdges > 0);

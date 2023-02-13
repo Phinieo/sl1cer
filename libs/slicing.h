@@ -300,7 +300,100 @@ int addUniqueEdge(struct edge e, struct edge* edges, int* numEdges){
 
 
 
+int countLoops(struct edge* edges, int numEdges){
 
+   int numLoops = 0;
+
+
+   struct point currentPoint;
+
+   currentPoint.X = edges[0].p1.X;
+   currentPoint.Y = edges[0].p1.Y;
+   currentPoint.Z = edges[0].p1.Z;
+
+
+   //STRUCTURE TO SAVE THE COUNTED EDGES IN
+   struct edge* usedEdges = calloc(numEdges, sizeof(struct edge));
+   int numUsedEdges = 0;
+
+
+   int loopOngoingFlag = 0;
+
+   while(numUsedEdges < numEdges){
+
+      loopOngoingFlag = 0;
+
+      for(int i = 0; i < numEdges; i++){
+
+         if(currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y, currentPoint.Z == edges[i].p1.Z){
+
+            if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
+
+               printf("\n\n\nDEBUG1!!!!!!\n\n\n\n");
+
+               currentPoint.X = edges[i].p2.X;
+               currentPoint.Y = edges[i].p2.Y;
+               currentPoint.Z = edges[i].p2.Z;
+
+               loopOngoingFlag += 1;
+
+            }
+
+         }else if(currentPoint.X == edges[i].p2.X && currentPoint.Y == edges[i].p2.Y, currentPoint.Z == edges[i].p2.Z){
+
+            if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
+
+               printf("\n\n\nDEBUG1!!!!!!\n\n\n\n");
+
+               currentPoint.X = edges[i].p1.X;
+               currentPoint.Y = edges[i].p1.Y;
+               currentPoint.Z = edges[i].p1.Z;
+
+               loopOngoingFlag += 1;
+
+            }
+
+         }
+
+
+      }
+
+
+      if(loopOngoingFlag == 0){
+
+         numLoops++;
+
+         printf("\n\n\nDEBUG2!!!!!!\n\n\n\n");
+
+         for(int i = 0; i < numEdges; i++){
+
+            if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
+
+               currentPoint.X = edges[i].p2.X;
+               currentPoint.Y = edges[i].p2.Y;
+               currentPoint.Z = edges[i].p2.Z;
+
+               break;
+
+            }
+
+         }
+
+
+
+      }
+
+      printf("\n\n\nDEBUG3!!!!!!\n\n\n\n");
+
+   }
+
+   free(usedEdges);
+
+   numLoops++;
+
+   return numLoops;
+
+}
 
 
 
