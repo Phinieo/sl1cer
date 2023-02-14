@@ -1,4 +1,45 @@
 
+
+
+//RETURNED POINTER MUST BE FREE'D
+struct tri* readAsciiSTL(char* filename, unsigned int* numTriangles){
+
+   FILE* fp = fopen(filename, "rb");
+   if(fp == NULL){
+
+      printf("\n\nNO FILE FOUND!\n\n");
+      return NULL;
+
+   }
+
+
+   int maxLineLength = 1000;
+   char line[maxLineLength];
+
+
+   while(fgets(line, maxLineLength, fp)){
+
+      if(strstr(line, "endfacet")){
+
+         (*numTriangles)++;
+
+      }
+
+   }
+   
+
+
+   struct tri* triangles = calloc(*numTriangles, sizeof(struct tri));
+
+   printf("\n\nNUMBER OF ASCII TRIANGLES: %d\n\n",*numTriangles);
+
+   return triangles;
+
+}
+
+
+
+
 //RETURNED POINTER MUST BE FREE'D
 struct tri* readSTL(char* filename, unsigned int* numTriangles){
 
@@ -9,6 +50,12 @@ struct tri* readSTL(char* filename, unsigned int* numTriangles){
 
    fp = fopen(filename, "rb");
 
+   if(fp == NULL){
+
+      printf("\n\nNO FILE FOUND!\n\n");
+      return NULL;
+
+   }
 
 
 

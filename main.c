@@ -60,11 +60,15 @@ int main(){
 
 
 
-
+/*
    unsigned int numTriangles = 0;
 
    struct tri* triangles = readSTL(STL_IN, &numTriangles);
+*/
 
+   unsigned int numTriangles = 0;
+
+   struct tri* triangles = readAsciiSTL(STL_IN, &numTriangles);
 
 
 
@@ -98,7 +102,7 @@ int main(){
 
 
    int numEdges = 0;
-
+/*
    do{
 
       struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
@@ -126,7 +130,7 @@ int main(){
 
 
 
-/*
+
       for(int i = 0; i < PERIMETERS - 1; i++){
 
          printf("INTERIOR PERIMETER; %d\n",i);
@@ -143,7 +147,7 @@ int main(){
 
 
       }
-*/
+
 
       layerUp(&currentLocation, fp);
 
@@ -158,7 +162,7 @@ int main(){
 
 
 
-
+*/
 
 
 
