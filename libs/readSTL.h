@@ -1,22 +1,60 @@
 
+//POSSIBLE BUGS: COULD BE SOME WEIRDNESS WITH CHECKING FOR 'solid' STRING
+//POSSIBLE BUGS: IN READING 5 BYTES, BYTE SIZE IS HARDCODED
+int binaryOrAsciiSTL(char* filename){
 
-
-//RETURNED POINTER MUST BE FREE'D
-struct tri* readAsciiSTL(char* filename, unsigned int* numTriangles){
-
+   //OPEN FILE
    FILE* fp = fopen(filename, "rb");
    if(fp == NULL){
 
-      printf("\n\nNO FILE FOUND!\n\n");
-      return NULL;
+      printf("\n\nERROR: FILE COULD NOT BE OPENED\n\n");
+      return -1;
 
    }
 
 
+   char fileStart[6];
+   fileStart[5] = '\0';
+
+   //READ FIRST 5 BYTES
+   fread(&fileStart, 1, 5, fp);
+
+
+   //IF THE FILE STARTS WTIH "solid" IT IS AN ASCII STL
+   if(strstr(fileStart, "solid")){
+
+      return 0;
+
+   }
+
+   //IF THE FILE DOES NOT START WITH "solid" IT IS A BINARY STL
+   return 1;
+   
+
+}
+
+
+
+
+//POSSIBLE BUGS: CASE SENSITVE TEXT
+//RETURNED POINTER MUST BE FREE'D
+struct tri* readAsciiSTL(char* filename, unsigned int* numTriangles){
+
+   //OPEN FILE
+   FILE* fp = fopen(filename, "rb");
+   if(fp == NULL){
+
+      printf("\n\nERROR: FILE COULD NOT BE OPENED\n\n");
+      return NULL;
+
+   }
+
+   //VARIABLES FOR READING DATA BY LINE
    int maxLineLength = 1000;
    char line[maxLineLength];
 
 
+   //DETERMINE NUMBER OF TRIANGLES IN FILE
    while(fgets(line, maxLineLength, fp)){
 
       if(strstr(line, "endfacet")){
@@ -26,12 +64,123 @@ struct tri* readAsciiSTL(char* filename, unsigned int* numTriangles){
       }
 
    }
+
+   //RESET READ POSITION AFTER FINDING NUM TRIANGLES
+   rewind(fp);
+
+   //THROW AWAY FIRST LINE
+   fgets(line, maxLineLength, fp);
+
    
 
-
+   //RETURNED TRIANGLE DATA STRUCTURE
    struct tri* triangles = calloc(*numTriangles, sizeof(struct tri));
+   int trianglesI = 0;
 
-   printf("\n\nNUMBER OF ASCII TRIANGLES: %d\n\n",*numTriangles);
+   //MAIN LOOP THAT GETS TRIANGLE DATA
+   while(fgets(line, maxLineLength, fp) != NULL){
+
+
+      //IF LINE IS "endsolid <name>\n" THE FILE IS DONE
+      if(strstr(line, "endsolid") != NULL){
+
+         printf("ASCII FILE READ SUCCESSFULLY\n");
+         break;
+
+      }
+
+
+      //CHECKS FOR START OF TRIANGLE TO DETERMINE FILE VALIDITY
+      if(strstr(line, "facet normal") == NULL){
+
+         printf("\nERROR: ASCII FILE FORMAT IS WRONG.\n");
+
+      }
+
+
+      //THROW AWAY "facet"
+      strtok(line, " ");
+
+      //THROW AWAY "normal"
+      strtok(NULL, " ");
+
+
+
+
+      //GET NORMAL'S X VALUE
+      triangles[trianglesI].normal.X = (float)atof(strtok(NULL, " "));
+
+      //GET NORMAL'S Y VALUE
+      triangles[trianglesI].normal.Y = (float)atof(strtok(NULL, " "));
+
+      //GET NORMAL'S Z VALUE
+      triangles[trianglesI].normal.Z = (float)atof(strtok(NULL, " "));
+
+
+      //SKIP "outer loop\n" LINE
+      fgets(line, maxLineLength, fp);
+
+
+
+
+
+
+      //READ TRIANGLE VERTEX DATA
+      //SAME CODE IS REPEATED FOR EACH TRIANGLE VERTICE
+
+      //READ NEXT LINE
+      fgets(line, maxLineLength, fp);
+
+      //SKIP "vertex" text
+      //ALSO INITIALIZE strtok() STATIC MEMORY TO NEW LINE
+      strtok(line, " ");
+
+      //READ IN X, Y, AND Z FOR VERTICE 1
+      triangles[trianglesI].p1.X = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p1.Y = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p1.Z = (float)atof(strtok(NULL, " "));
+
+
+
+      //READ NEXT LINE
+      fgets(line, maxLineLength, fp);
+
+      //SKIP "vertex" text
+      //ALSO INITIALIZE strtok() STATIC MEMORY TO NEW LINE
+      strtok(line, " ");
+
+      //READ IN X, Y, AND Z FOR VERTICE 2
+      triangles[trianglesI].p2.X = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p2.Y = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p2.Z = (float)atof(strtok(NULL, " "));
+
+
+
+      //READ NEXT LINE
+      fgets(line, maxLineLength, fp);
+
+      //SKIP "vertex" text
+      //ALSO INITIALIZE strtok() STATIC MEMORY TO NEW LINE
+      strtok(line, " ");
+
+      //READ IN X, Y, AND Z FOR VERTICE 3
+      triangles[trianglesI].p3.X = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p3.Y = (float)atof(strtok(NULL, " "));
+      triangles[trianglesI].p3.Z = (float)atof(strtok(NULL, " "));
+
+
+
+      //SKIP "endloop\n" LINE
+      fgets(line, maxLineLength, fp);
+      //SKIP "endfacet\n" LINE
+      fgets(line, maxLineLength, fp);
+
+
+      trianglesI++;
+
+   }
+
+   fclose(fp);
 
    return triangles;
 
@@ -41,7 +190,7 @@ struct tri* readAsciiSTL(char* filename, unsigned int* numTriangles){
 
 
 //RETURNED POINTER MUST BE FREE'D
-struct tri* readSTL(char* filename, unsigned int* numTriangles){
+struct tri* readBinarySTL(char* filename, unsigned int* numTriangles){
 
    FILE* fp;
 
@@ -52,7 +201,7 @@ struct tri* readSTL(char* filename, unsigned int* numTriangles){
 
    if(fp == NULL){
 
-      printf("\n\nNO FILE FOUND!\n\n");
+      printf("\n\nERROR: FILE COULD NOT BE OPENED\n\n");
       return NULL;
 
    }
