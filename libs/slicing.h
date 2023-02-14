@@ -289,6 +289,8 @@ int addUniqueEdge(struct edge e, struct edge* edges, int* numEdges){
 
    *numEdges = *numEdges + 1;
 
+   printf("\nADDING UNIQUE EDGE: %f, %f to %f, %f\n",e.p1.X, e.p1.Y, e.p2.X, e.p2.Y);
+
 
    return 1;
 
@@ -302,7 +304,16 @@ int addUniqueEdge(struct edge e, struct edge* edges, int* numEdges){
 
 int countLoops(struct edge* edges, int numEdges){
 
-   int numLoops = 0;
+   //SOLVES EDGE CASE IN WHICH THERE ARE NO LOOPS
+   if(numEdges == 0){
+
+      return 0;
+
+   }
+
+
+   //BELOW ALGORITHM STARTS ASSUMING THERE IS 1 LOOP TO OPERATE ON
+   int numLoops = 1;
 
 
    struct point currentPoint;
@@ -325,11 +336,12 @@ int countLoops(struct edge* edges, int numEdges){
 
       for(int i = 0; i < numEdges; i++){
 
-         if(currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y, currentPoint.Z == edges[i].p1.Z){
+         //printf("\nCOMPARING CURRENT %f, %f TO %f, %f",currentPoint.X,currentPoint.Y,edges[i].p1.X,edges[i].p1.Y);
+         //printf(" -- RESULT: %d\n\n",currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y, currentPoint.Z == edges[i].p1.Z);
+
+         if(currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y && currentPoint.Z == edges[i].p1.Z){
 
             if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
-
-               printf("\n\n\nDEBUG1!!!!!!\n\n\n\n");
 
                currentPoint.X = edges[i].p2.X;
                currentPoint.Y = edges[i].p2.Y;
@@ -337,19 +349,25 @@ int countLoops(struct edge* edges, int numEdges){
 
                loopOngoingFlag += 1;
 
+               //printf("\nBLOCK 1 - NEW CURRENT POINT: %f, %f\n\n",currentPoint.X,currentPoint.Y);
+
+               break;
+
             }
 
-         }else if(currentPoint.X == edges[i].p2.X && currentPoint.Y == edges[i].p2.Y, currentPoint.Z == edges[i].p2.Z){
+         }else if(currentPoint.X == edges[i].p2.X && currentPoint.Y == edges[i].p2.Y && currentPoint.Z == edges[i].p2.Z){
 
             if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
-
-               printf("\n\n\nDEBUG1!!!!!!\n\n\n\n");
 
                currentPoint.X = edges[i].p1.X;
                currentPoint.Y = edges[i].p1.Y;
                currentPoint.Z = edges[i].p1.Z;
 
                loopOngoingFlag += 1;
+
+               //printf("\nBLOCK 2 - NEW CURRENT POINT: %f, %f\n\n",currentPoint.X,currentPoint.Y);
+
+               break;
 
             }
 
@@ -362,8 +380,6 @@ int countLoops(struct edge* edges, int numEdges){
       if(loopOngoingFlag == 0){
 
          numLoops++;
-
-         printf("\n\n\nDEBUG2!!!!!!\n\n\n\n");
 
          for(int i = 0; i < numEdges; i++){
 
@@ -383,13 +399,11 @@ int countLoops(struct edge* edges, int numEdges){
 
       }
 
-      printf("\n\n\nDEBUG3!!!!!!\n\n\n\n");
 
    }
 
    free(usedEdges);
-
-   numLoops++;
+   
 
    return numLoops;
 
