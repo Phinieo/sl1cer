@@ -68,9 +68,17 @@ int main(){
 
    unsigned int numTriangles = 0;
 
-   binaryOrAsciiSTL(STL_IN);
+   struct tri* triangles;
 
-   struct tri* triangles = readAsciiSTL(STL_IN, &numTriangles);
+   if(binaryOrAsciiSTL(STL_IN)){
+
+      triangles = readBinarySTL(STL_IN, &numTriangles);
+
+   }else{
+
+      triangles = readAsciiSTL(STL_IN, &numTriangles);
+
+   }
 
 
 
@@ -119,15 +127,15 @@ int main(){
 
 
 
-      //int* edgesPerLoop;
+      int* edgesPerLoop;
 
-      //int currentLoop = 0;
-
-
-      //struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
+      int currentLoop = 0;
 
 
-      //writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
+      struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
+
+
+      writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
 
 
 
