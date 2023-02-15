@@ -118,7 +118,27 @@ int main(){
       struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
 
 
-      printf("\n\n\n\n\n\nNUMBER OF LOOPS: %d\n\n\n\n\n\n",countLoops(layerEdges, numEdges));
+      int numLoops = countLoops(layerEdges, numEdges);
+
+      for(int i = 0; i < numLoops; i++){
+
+         int numTestEdges = 0;
+
+         struct edge* test = testLoops(layerEdges, numEdges, i, &numTestEdges);
+
+         printf("LOOP %d:\n\n",i);
+         for(int i2 = 0; i2 < numTestEdges; i2++){
+
+            printf("EDGE %d: %f, %f TO %f, %f\n", i2, test[i2].p1.X, test[i2].p1.Y, test[i2].p2.X, test[i2].p2.Y);
+
+         }
+
+         free(test);
+
+      }
+
+
+
 
       //Get Number of loop in layerEdges
 
@@ -127,15 +147,15 @@ int main(){
 
 
 
-      int* edgesPerLoop;
+      //int* edgesPerLoop;
 
-      int currentLoop = 0;
-
-
-      struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
+      //int currentLoop = 0;
 
 
-      writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
+      //struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
+
+
+      //writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
 
 
 

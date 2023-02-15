@@ -289,7 +289,7 @@ int addUniqueEdge(struct edge e, struct edge* edges, int* numEdges){
 
    *numEdges = *numEdges + 1;
 
-   printf("\nADDING UNIQUE EDGE: %f, %f to %f, %f\n",e.p1.X, e.p1.Y, e.p2.X, e.p2.Y);
+   //printf("\nADDING UNIQUE EDGE: %f, %f to %f, %f\n",e.p1.X, e.p1.Y, e.p2.X, e.p2.Y);
 
 
    return 1;
@@ -311,9 +311,8 @@ int countLoops(struct edge* edges, int numEdges){
 
    }
 
-
-   //BELOW ALGORITHM STARTS ASSUMING THERE IS 1 LOOP TO OPERATE ON
-   int numLoops = 1;
+   //RETURN VALUE TO BE COMPUTED
+   int numLoops = 0;
 
 
    struct point currentPoint;
@@ -330,6 +329,7 @@ int countLoops(struct edge* edges, int numEdges){
 
    int loopOngoingFlag = 0;
 
+   //CONTINUE FINDING LOOPS UNTILL ALL EDGES ARE USED
    while(numUsedEdges < numEdges){
 
       loopOngoingFlag = 0;
@@ -339,6 +339,7 @@ int countLoops(struct edge* edges, int numEdges){
          //printf("\nCOMPARING CURRENT %f, %f TO %f, %f",currentPoint.X,currentPoint.Y,edges[i].p1.X,edges[i].p1.Y);
          //printf(" -- RESULT: %d\n\n",currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y, currentPoint.Z == edges[i].p1.Z);
 
+         //ADD A CONNECTED EDGE
          if(currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y && currentPoint.Z == edges[i].p1.Z){
 
             if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
@@ -355,6 +356,7 @@ int countLoops(struct edge* edges, int numEdges){
 
             }
 
+         //ADD A REVERSED EDGE
          }else if(currentPoint.X == edges[i].p2.X && currentPoint.Y == edges[i].p2.Y && currentPoint.Z == edges[i].p2.Z){
 
             if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
@@ -376,11 +378,14 @@ int countLoops(struct edge* edges, int numEdges){
 
       }
 
-
+      //IF LOOP HAS ENDED
+      //TRIGGERS IF EACH POINT IN INPUT EDGE LIST IS CHECKED AND NONE ARE PART OF THE CURRENT LOOP
       if(loopOngoingFlag == 0){
 
          numLoops++;
 
+         //FINDS THE AN EDGE THAT IS NOT IN ANY PREVIOUS LOOPS
+         //FINDS THE START OF A NEW LOOP
          for(int i = 0; i < numEdges; i++){
 
             if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
@@ -404,10 +409,208 @@ int countLoops(struct edge* edges, int numEdges){
 
    free(usedEdges);
    
+   numLoops++;
 
    return numLoops;
 
 }
+
+
+
+
+
+
+
+struct edge* testLoops(struct edge* edges, int numEdges, int targetLoop, int* targetLoopSize){
+
+   //SOLVES EDGE CASE IN WHICH THERE ARE NO LOOPS
+   if(numEdges == 0){
+
+      return 0;
+
+   }
+
+   //USED TO DETERMINE WHICH LOOP IS BEING COMPUTED
+   //COMPARED TO targetLoop
+   int numLoops = 0;
+
+
+   //WILL REPRESENT THE STARTING INDECIE OF THE TARGET LOOP INSIDE usedEdges
+   int targetLoopStart = -1;
+
+
+   struct point currentPoint;
+
+   currentPoint.X = edges[0].p1.X;
+   currentPoint.Y = edges[0].p1.Y;
+   currentPoint.Z = edges[0].p1.Z;
+
+
+   //STRUCTURE TO SAVE THE COUNTED EDGES IN
+   struct edge* usedEdges = calloc(numEdges, sizeof(struct edge));
+   int numUsedEdges = 0;
+
+
+   int loopOngoingFlag = 0;
+
+   //CONTINUE FINDING LOOPS UNTILL ALL EDGES ARE USED
+   while(numUsedEdges < numEdges){
+
+
+
+      if(numLoops == targetLoop && targetLoopStart == -1){
+
+        //IF THE FIRST LOOP IS THE TARGET LOOP START AT 0
+        if(numUsedEdges == 0){
+
+           targetLoopStart = numUsedEdges;
+
+        //IF THE TARGET LOOP IS A DIFFERENT LOOP THEN START AT 1 LESS THAN THE NUMBER OF USED EDGES
+        //THE LOOPS FIRST EDGE IS ADDED BEFORE THIS CHECK AND numUsedEdges GETS ITERATED EARLY
+        }else{
+
+           targetLoopStart = numUsedEdges - 1;
+
+        }
+        //printf("REACHED TARGET LOOP\n");
+
+      }
+
+
+
+      loopOngoingFlag = 0;
+
+      for(int i = 0; i < numEdges; i++){
+
+         //printf("\nCOMPARING CURRENT %f, %f TO %f, %f",currentPoint.X,currentPoint.Y,edges[i].p1.X,edges[i].p1.Y);
+         //printf(" -- RESULT: %d\n\n",currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y, currentPoint.Z == edges[i].p1.Z);
+
+         //ADD A CONNECTED EDGE
+         if(currentPoint.X == edges[i].p1.X && currentPoint.Y == edges[i].p1.Y && currentPoint.Z == edges[i].p1.Z){
+
+            if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
+
+               currentPoint.X = edges[i].p2.X;
+               currentPoint.Y = edges[i].p2.Y;
+               currentPoint.Z = edges[i].p2.Z;
+
+               loopOngoingFlag += 1;
+
+               //printf("\nBLOCK 1 - NEW CURRENT POINT: %f, %f\n\n",currentPoint.X,currentPoint.Y);
+
+               break;
+
+            }
+
+         //ADD A REVERSED EDGE
+         }else if(currentPoint.X == edges[i].p2.X && currentPoint.Y == edges[i].p2.Y && currentPoint.Z == edges[i].p2.Z){
+
+            if(addUniqueEdge(swapEdgePoints(edges[i]), usedEdges, &numUsedEdges)){
+
+               currentPoint.X = edges[i].p1.X;
+               currentPoint.Y = edges[i].p1.Y;
+               currentPoint.Z = edges[i].p1.Z;
+
+               loopOngoingFlag += 1;
+
+               //printf("\nBLOCK 2 - NEW CURRENT POINT: %f, %f\n\n",currentPoint.X,currentPoint.Y);
+
+               break;
+
+            }
+
+         }
+
+
+      }
+
+
+      //IF LOOP HAS ENDED
+      //TRIGGERS IF EACH POINT IN INPUT EDGE LIST IS CHECKED AND NONE ARE PART OF THE CURRENT LOOP
+      if(loopOngoingFlag == 0){
+
+         //RETURN CONDITION
+         //ENTERS IF WE HAVE FOUND THE START OF THE TARGET LOOP
+         //ABOVE IF ALSO GUARUNTEES WE HAVE FINISHED COMPUTING THAT LOOP
+         if(targetLoopStart != -1){
+
+            struct edge* temp = calloc(numUsedEdges - targetLoopStart, sizeof(struct edge));
+            *targetLoopSize = 0;
+
+
+            for(int i = 0; i < (numUsedEdges - targetLoopStart); i++){
+
+               addUniqueEdge(usedEdges[targetLoopStart + i], temp, targetLoopSize);
+
+            }
+
+
+            free(usedEdges);
+
+            return temp;
+
+         }
+
+         numLoops++;
+
+
+         //FINDS THE AN EDGE THAT IS NOT IN ANY PREVIOUS LOOPS
+         //FINDS THE START OF A NEW LOOPb
+         for(int i = 0; i < numEdges; i++){
+
+            if(addUniqueEdge(edges[i], usedEdges, &numUsedEdges)){
+
+               currentPoint.X = edges[i].p2.X;
+               currentPoint.Y = edges[i].p2.Y;
+               currentPoint.Z = edges[i].p2.Z;
+
+               break;
+
+            }
+
+         }
+
+
+
+      }
+
+
+   }
+
+
+   //RETURN LAST FOUND LOOP IF SELECTED LOOP IS AT THE END OF THE INPUT LIST OF EDGES
+
+   //RETURN CONDITION
+   //ENTERS IF WE HAVE FOUND THE START OF THE TARGET LOOP
+   //ABOVE IF ALSO GUARUNTEES WE HAVE FINISHED COMPUTING THAT LOOP
+   if(targetLoopStart != -1){
+
+      struct edge* temp = calloc(numUsedEdges - targetLoopStart, sizeof(struct edge));
+      *targetLoopSize = 0;
+
+
+      for(int i = 0; i < (numUsedEdges - targetLoopStart); i++){
+
+         addUniqueEdge(usedEdges[targetLoopStart + i], temp, targetLoopSize);
+
+      }
+
+
+      free(usedEdges);
+
+      return temp;
+
+   }
+
+
+   printf("ERROR: TRIED TO FIND LOOP THAT DID NOT EXIST");
+   return NULL;
+
+
+}
+
+
+
 
 
 

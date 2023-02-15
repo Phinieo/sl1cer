@@ -31,6 +31,28 @@ struct tri{
 
 };
 
+//SWAPS THE POINTS OF A GIVEN EDGE
+//DOES NOT CHANGE NORMAL
+struct edge swapEdgePoints(struct edge e){
+
+   struct point temp;
+
+   temp.X = e.p1.X;
+   temp.Y = e.p1.Y;
+   temp.Z = e.p1.Z;
+
+   e.p1.X = e.p2.X;
+   e.p1.Y = e.p2.Y;
+   e.p1.Z = e.p2.Z;
+
+   e.p2.X = temp.X;
+   e.p2.Y = temp.Y;
+   e.p2.Z = temp.Z;
+
+   return e;
+
+}
+
 
 //USED TO COMPARE TWO FLOAT VALUES
 //PREVENTS ISSUES DUE TO FLOATING POINT MATH WEIRDNESS
