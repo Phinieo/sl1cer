@@ -170,6 +170,70 @@ void endRetract(float* currentExtrusion, FILE *fp){
 }
 
 
+//POSSIBLE PROBLEM: MOVES TO FIRST POINT, NOT CLOSEST POINT
+void writeLoop(struct edge* loopIN, int numEdges, struct point* currentPoint, float* currentExtrusion, FILE *fp){
+
+
+   //MAKE NEW ARRAY SO AS TO NOT CHANGE INPUT LOOP ARRAY
+   struct edge* loop = (struct edge*)calloc(sizeof(struct edge),numEdges);
+
+
+
+   //MOVE EDGES TO ABSOLUTE POINTS ON PRINTBED
+
+   for(int i = 0; i < numEdges; i++){
+
+      loop[i] = centerEdge(loopIN[i]);
+
+   }
+
+
+
+   //GCODE WRITE
+   //MOVE TO FIRST POINT ON THIS LAYER
+
+   (*currentPoint).X = loop[0].p1.X;
+   (*currentPoint).Y = loop[0].p1.Y;
+
+   writeG1("F", (float[1]){TRAVEL_SPEED}, fp);
+
+   writeG1("XY", (float[2]){loop[0].p1.X, loop[0].p1.Y}, fp);
+
+
+
+   //END RETRACTION BEFORE PRINTING LOOPS
+   endRetract(currentExtrusion, fp);
+
+
+   //SET SPEED FOR PERIMETER PRINTING
+   writeG1("F", (float[1]){PERIMETER_SPEED}, fp);
+
+   //PRINT PERIMETER
+   for(int i = 0; i < numEdges; i++){
+
+      if((*currentPoint).X == loop[i].p1.X && (*currentPoint).Y == loop[i].p1.Y){
+
+         (*currentExtrusion) += perimeterExtrusion(pointDistance(loop[i].p1, loop[i].p2));
+
+         writeG1("XYE", (float[3]){loop[i].p2.X, loop[i].p2.Y, (*currentExtrusion)}, fp);
+
+         (*currentPoint).X = loop[i].p2.X;
+         (*currentPoint).Y = loop[i].p2.Y;
+
+      }
+
+   }
+
+
+   //START RETRACTION FOR NEXT LOOP OR MOVEMENT
+   startRetract(currentExtrusion, fp);
+
+
+   free(loop);
+
+   return;
+
+}
 
 
 void writeLayerPerim(struct edge* loopsIN, int numEdges, int* edgesPerLoop, int numLoops, struct point* currentPoint, float* currentExtrusion, FILE *fp){

@@ -122,17 +122,21 @@ int main(){
 
       for(int i = 0; i < numLoops; i++){
 
-         int numTestEdges = 0;
+         int numLoopEdges = 0;
 
-         struct edge* test = testLoops(layerEdges, numEdges, i, &numTestEdges);
+         struct edge* test = getLoop(layerEdges, numEdges, i, &numLoopEdges);
 
+         writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
+
+
+/*
          printf("LOOP %d:\n\n",i);
          for(int i2 = 0; i2 < numTestEdges; i2++){
 
             printf("EDGE %d: %f, %f TO %f, %f\n", i2, test[i2].p1.X, test[i2].p1.Y, test[i2].p2.X, test[i2].p2.Y);
 
          }
-
+*/
          free(test);
 
       }

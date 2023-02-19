@@ -421,7 +421,7 @@ int countLoops(struct edge* edges, int numEdges){
 
 
 
-struct edge* testLoops(struct edge* edges, int numEdges, int targetLoop, int* targetLoopSize){
+struct edge* getLoop(struct edge* edges, int numEdges, int targetLoop, int* targetLoopSize){
 
    //SOLVES EDGE CASE IN WHICH THERE ARE NO LOOPS
    if(numEdges == 0){

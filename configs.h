@@ -2,7 +2,7 @@
 //FILE//
 ////////
 
-#define STL_IN "testSTLs/cat2.stl"
+#define STL_IN "testSTLs/gombic.stl"
 #define GCODE_OUT "testGcode.gcode"
 
 #define OBJECT_X 20
@@ -61,7 +61,7 @@
 //RESOLUTION & WIDTH//
 //////////////////////
 
-#define LAYER_HEIGHT 0.3
+#define LAYER_HEIGHT 0.2
 
 #define PERIMETERS 3
 
