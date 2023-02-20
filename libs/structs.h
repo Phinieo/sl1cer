@@ -93,6 +93,130 @@ float pointDistance(struct point p1, struct point p2){
 
 
 
+
+
+
+
+struct point normal3Dto2D(struct point normal3D){
+
+   struct point zero;
+   zero.X = 0;
+   zero.Y = 0;
+   zero.Z = 0;
+
+
+   struct point normal2D;
+   normal2D.X = normal3D.X;
+   normal2D.Y = normal3D.Y;
+   normal2D.Z = 0.0;
+
+
+   float magnitude = pointDistance(zero, normal2D);
+
+
+   normal2D.X = (normal2D.X / magnitude == 0) ? 0 : (normal2D.X / magnitude);
+
+   normal2D.Y = (normal2D.Y / magnitude == 0) ? 0 : (normal2D.Y / magnitude);
+
+   normal2D.Z = 0.0;
+
+
+   return normal2D;
+
+
+}
+
+
+
+
+
+
+//SHRINKS EDGE TOWARDS ITS CENTER BY A SET AMOUNT ON EITHER SIDE
+//2D FUNCTION -- RETURNS IDENTICAL Z VALUES TO INPUG EDGE
+//RETURNS IDENTICAL NORMAL ON EDGE BUT ONLY CONSIDERS 2D NORMAL
+struct edge shrinkEdge(struct edge edgeIn, float shrinkLength){
+
+   struct edge shrunkEdge;
+
+   shrunkEdge.normal = normal3Dto2D(edgeIn.normal);
+
+
+   if(edgeIn.p1.X > edgeIn.p2.X){
+
+      shrunkEdge.p1.X = edgeIn.p1.X - fabs(shrunkEdge.normal.Y * shrinkLength);
+      shrunkEdge.p2.X = edgeIn.p2.X + fabs(shrunkEdge.normal.Y * shrinkLength);
+
+   }else{
+
+      shrunkEdge.p1.X = edgeIn.p1.X + fabs(shrunkEdge.normal.Y * shrinkLength);
+      shrunkEdge.p2.X = edgeIn.p2.X - fabs(shrunkEdge.normal.Y * shrinkLength);
+
+   }
+
+   if(edgeIn.p1.Y > edgeIn.p2.Y){
+
+      shrunkEdge.p1.Y = edgeIn.p1.Y - fabs(shrunkEdge.normal.X * shrinkLength);
+      shrunkEdge.p2.Y = edgeIn.p2.Y + fabs(shrunkEdge.normal.X * shrinkLength);
+
+   }else{
+
+      shrunkEdge.p1.Y = edgeIn.p1.Y + fabs(shrunkEdge.normal.X * shrinkLength);
+      shrunkEdge.p2.Y = edgeIn.p2.Y - fabs(shrunkEdge.normal.X * shrinkLength);
+
+   }
+
+
+   shrunkEdge.p1.Z = edgeIn.p1.Z;
+   shrunkEdge.p2.Z = edgeIn.p2.Z;
+
+   shrunkEdge.normal.X = edgeIn.normal.X;
+   shrunkEdge.normal.Y = edgeIn.normal.Y;
+   shrunkEdge.normal.Z = edgeIn.normal.Z;
+
+
+   return shrunkEdge;
+
+}
+
+
+
+
+
+
+
+
+struct edge scaleEdgeInwards(struct edge bigEdge, float distIn){
+
+   struct edge smallEdge = bigEdge;
+
+   smallEdge.normal = normal3Dto2D(bigEdge.normal);
+
+   smallEdge.p1.X = smallEdge.p1.X + (smallEdge.normal.X * distIn * -1);
+   smallEdge.p1.Y = smallEdge.p1.Y + (smallEdge.normal.Y * distIn * -1);
+
+
+   smallEdge.p2.X = smallEdge.p2.X + (smallEdge.normal.X * distIn * -1);
+   smallEdge.p2.Y = smallEdge.p2.Y + (smallEdge.normal.Y * distIn * -1);
+
+/*
+
+   printf("\nINPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",bigEdge.p1.X,bigEdge.p1.Y,bigEdge.p2.X,bigEdge.p2.Y,bigEdge.normal.X,bigEdge.normal.Y,bigEdge.normal.Z);
+
+   printf("\nOUTPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",smallEdge.p1.X,smallEdge.p1.Y,smallEdge.p2.X,smallEdge.p2.Y,smallEdge.normal.X,smallEdge.normal.Y,smallEdge.normal.Z);
+
+*/
+
+
+   return smallEdge;
+
+}
+
+
+
+
+
 int triFacesUp(struct tri t){
 
    if(t.normal.X == 0 && t.normal.Y == 0 && t.normal.Z == 1){
@@ -174,38 +298,6 @@ struct point computeNormal(struct tri Triangle){
 
 }
 
-
-
-
-
-
-struct point normal3Dto2D(struct point normal3D){
-
-   struct point zero;
-   zero.X = 0;
-   zero.Y = 0;
-   zero.Z = 0;
-
-
-   struct point normal2D;
-
-   normal2D.X = normal3D.X;
-   normal2D.Y = normal3D.Y;
-   normal2D.Z = 0.0;
-
-
-   float magnitude = pointDistance(zero, normal2D);
-
-
-   normal2D.X = normal2D.X / magnitude == 0 ? 0 : normal2D.X / magnitude;
-
-   normal2D.Y = normal2D.Y / magnitude == 0 ? 0 : normal2D.Y / magnitude;
-
-
-   return normal2D;
-
-
-}
 
 
 

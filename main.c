@@ -129,59 +129,20 @@ int main(){
          writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
 
 
-/*
-         printf("LOOP %d:\n\n",i);
-         for(int i2 = 0; i2 < numTestEdges; i2++){
+         for(int i2 = 0; i2 < (PERIMETERS - 1); i2++){
 
-            printf("EDGE %d: %f, %f TO %f, %f\n", i2, test[i2].p1.X, test[i2].p1.Y, test[i2].p2.X, test[i2].p2.Y);
+            shrinkLoop(test, INTERNAL_PERIMETER_WIDTH);
+            writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
+
 
          }
-*/
+
+
+
          free(test);
 
       }
 
-
-
-
-      //Get Number of loop in layerEdges
-
-      //for each loop, starting from the clostest starting point, assemble the loop and generate Gcode
-
-
-
-
-      //int* edgesPerLoop;
-
-      //int currentLoop = 0;
-
-
-      //struct edge* loops = edgesToLoops(layerEdges, numEdges, currentLocation, &edgesPerLoop, &currentLoop);
-
-
-      //writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
-
-
-
-
-/*
-      for(int i = 0; i < PERIMETERS - 1; i++){
-
-         printf("INTERIOR PERIMETER; %d\n",i);
-
-         struct edge* temp = shrinkLoops(loops, numEdges, edgesPerLoop, currentLoop);
-
-         free(loops);
-
-         loops = temp;
-
-
-         writeLayerPerim(loops, numEdges, edgesPerLoop, currentLoop, &currentLocation, &currentExtrusion, fp);
-
-
-
-      }
-*/
 
       layerUp(&currentLocation, fp);
 
@@ -206,6 +167,39 @@ int main(){
 
    //CLOSE THE FILE POINTER
    fclose(fp);
+
+
+
+   struct edge testEdge;
+
+   testEdge.p1.X = 1.0;
+   testEdge.p1.Y = 0.0;
+   testEdge.p1.Z = 0.0;
+
+   testEdge.p2.X = -1.0;
+   testEdge.p2.Y = 0.0;
+   testEdge.p2.Z = 0.0;
+
+   testEdge.normal.X = 0.0;
+   testEdge.normal.Y = 1.0;
+   testEdge.normal.Z = 0.0;
+
+   
+   printf("\nINPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
+
+   testEdge = scaleEdgeInwards(testEdge, 0.5);
+
+   printf("\nOUTPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
+
+   testEdge = shrinkEdge(testEdge, 0.5);
+
+   printf("\nOUTPUT EDGE:\n\n");
+   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
+
+
+
 
 
 
