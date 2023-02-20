@@ -754,116 +754,47 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
 
 
 
+//SHRINKS A LOOP BY COMPUTING POINT NORMALS AND MOVING THEM INWARDS BY AN AMOUNT
+//RETURNED POINTER MUST BE FREE'D
+//INPUT loopEdges IS FREE'D IN FUNCTION
 
-
-struct edge* shrinkLoop(struct edge* loopEdges, int numLoopEdges){
+struct edge* shrinkLoop(struct edge* loopEdges, int numLoopEdges, float shrinkDist){
 
 
    struct edge* newLoop = (struct edge*)calloc(sizeof(struct edge),numLoopEdges);
 
-
-   //SHRINK ALL LOOPS
    for(int i = 0; i < numLoopEdges; i++){
 
-      printf("SHRINKING EDGE: %d\n",i);
-
+      struct point pointNormal;
       
-      printf("\nINPUT EDGE:\n\n");
-      printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f\n\n",loopEdges[i].p1.X,loopEdges[i].p1.Y,loopEdges[i].p2.X,loopEdges[i].p2.Y,loopEdges[i].normal.X,loopEdges[i].normal.Y,loopEdges[i].normal.Z);
+      //COMBINE THE NORMALS OF CURRENT EDGE AND NEXT EDGE
+      //NEXT EDGE IS MOD numLoopEdges TO WRAP AROUND TO FIRST
+      //CONVERTED TO 2D NORMAL VECTOR ON XY PLANE
+      pointNormal = normal3Dto2D(combineNormals(loopEdges[i].normal, loopEdges[( (i + 1) % numLoopEdges )].normal));
 
+      //MODIFY CURRENT EDGES POINT
+      newLoop[i].p2.X = loopEdges[i].p2.X + (pointNormal.X * shrinkDist * -1);
+      newLoop[i].p2.Y = loopEdges[i].p2.Y + (pointNormal.Y * shrinkDist * -1);
+      newLoop[i].p2.Z = loopEdges[i].p2.Z + (pointNormal.Z * shrinkDist * -1);
 
-      newLoop[i] = scaleEdgeInwards(loopEdges[i], EXTRUSION_WIDTH);
-      //newLoop[i] = shrinkEdge(newLoop[i], EXTRUSION_WIDTH);
-
-
-      printf("\nOUTPUT EDGE:\n\n");
-      printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f\n\n",newLoop[i].p1.X,newLoop[i].p1.Y,newLoop[i].p2.X,newLoop[i].p2.Y,newLoop[i].normal.X,newLoop[i].normal.Y,newLoop[i].normal.Z);
-
-
-
-
+      //MODIFY NEXT EDGES POINT (SHOULD BE SAME POINT AS ABOVE)
+      newLoop[( (i + 1) % numLoopEdges )].p1.X = loopEdges[( (i + 1) % numLoopEdges )].p1.X + (pointNormal.X * shrinkDist * -1);
+      newLoop[( (i + 1) % numLoopEdges )].p1.Y = loopEdges[( (i + 1) % numLoopEdges )].p1.Y + (pointNormal.Y * shrinkDist * -1);
+      newLoop[( (i + 1) % numLoopEdges )].p1.Z = loopEdges[( (i + 1) % numLoopEdges )].p1.Z + (pointNormal.Z * shrinkDist * -1);
+      
+      newLoop[i].normal = loopEdges[i].normal;
    }
-/*
-   printf("ALL LOOP SHRINKING FINSISHED. FINDING NEW INTERSECTIONS\n");
 
-   //FIND NEW INTERSECTIONS
-   for(int i = 0; i < numLoops; i++){
-   
-      for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
+   for(int i = 0; i < numLoopEdges; i++){
 
-         printf("Loop - i: %d, i2: %d\n",i,i2);
-
-
-         int edge1Index = i * layerEdgesI + i2;
-         int edge2Index = i * layerEdgesI + ((edgesPerLoop[i] - 1 + i2)%edgesPerLoop[i]);
-
-         struct point temp = intersection(newLoops[edge1Index], newLoops[edge2Index]);
-
-         printf("EDGE1: %f, %f ---- %f, %f\n",newLoops[edge1Index].p1.X,newLoops[edge1Index].p1.Y,newLoops[edge1Index].p2.X,newLoops[edge1Index].p2.Y);
-         printf("EDGE2: %f, %f ---- %f, %f\n",newLoops[edge2Index].p1.X,newLoops[edge2Index].p1.Y,newLoops[edge2Index].p2.X,newLoops[edge2Index].p2.Y);
-
-
-         //IF THERE IS NO INTERSECTION BETWEEN EDGE I and I+1
-         if(temp.X == FLT_MAX && temp.Y == FLT_MAX){
-
-            printf("\n\nNO INTERSECTION ERROR!!! BIG BAD\n\n");
-
-            temp.X = 0.0;
-            temp.Y = 0.0;
-
-         }
-
-
-         //IF POINT 1 CONNECTS TO POINT 1 OF THE NEXT EDGE
-         if(layerEdges[edge1Index].p1.X == layerEdges[edge2Index].p1.X && layerEdges[edge1Index].p1.Y == layerEdges[edge2Index].p1.Y){
-
-            layerEdges[edge1Index].p1 = temp;
-            layerEdges[edge2Index].p1 = temp;
-            continue;
-
-         }
-
-         //IF POINT 1 CONNECTS TO POINT 2 OF THE NEXT EDGE
-         if(layerEdges[edge1Index].p1.X == layerEdges[edge2Index].p2.X && layerEdges[edge1Index].p1.Y == layerEdges[edge2Index].p2.Y){
-
-            layerEdges[edge1Index].p1 = temp;
-            layerEdges[edge2Index].p2 = temp;
-            continue;
-
-         }
-
-
-         //IF POINT 2 CONNECTS TO POINT 1 OF THE NEXT EDGE
-         if(layerEdges[edge1Index].p2.X == layerEdges[edge2Index].p1.X && layerEdges[edge1Index].p2.Y == layerEdges[edge2Index].p1.Y){
-
-            layerEdges[edge1Index].p2 = temp;
-            layerEdges[edge2Index].p1 = temp;
-            continue;
-
-         }
-
-
-         //IF POINT 2 CONNECTS TO POINT 2 OF THE NEXT EDGE
-         if(layerEdges[edge1Index].p2.X == layerEdges[edge2Index].p2.X && layerEdges[edge1Index].p2.Y == layerEdges[edge2Index].p2.Y){
-
-            layerEdges[edge1Index].p2 = temp;
-            layerEdges[edge2Index].p2 = temp;
-            continue;
-
-         }
-
-
-
-
-
-
-
-      }
+      printf("UNSHRK EDGE %d: %f, %f to %f, %f\n", i, loopEdges[i].p1.X,loopEdges[i].p1.Y,loopEdges[i].p2.X,loopEdges[i].p2.Y);
+      printf("SHRUNK EDGE %d: %f, %f to %f, %f\n\n", i, newLoop[i].p1.X, newLoop[i].p1.Y, newLoop[i].p2.X, newLoop[i].p2.Y);
 
    }
 
 
-*/
+   free(loopEdges);
+
    return newLoop;
   
 
