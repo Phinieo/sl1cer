@@ -93,7 +93,33 @@ float pointDistance(struct point p1, struct point p2){
 
 
 
+struct point combineNormals(struct point normal1, struct point normal2){
 
+   struct point zero;
+   zero.X = 0;
+   zero.Y = 0;
+   zero.Z = 0;
+
+   struct point combinedNormals;
+   combinedNormals.X = normal1.X + normal2.X;
+   combinedNormals.Y = normal1.Y + normal2.Y;
+   combinedNormals.Z = normal1.Z + normal2.Z;
+
+
+   float magnitude = pointDistance(zero, combinedNormals);
+
+
+   combinedNormals.X = (combinedNormals.X / magnitude == 0) ? 0 : (combinedNormals.X / magnitude);
+
+   combinedNormals.Y = (combinedNormals.Y / magnitude == 0) ? 0 : (combinedNormals.Y / magnitude);
+
+   combinedNormals.Z = (combinedNormals.Z / magnitude == 0) ? 0 : (combinedNormals.Z / magnitude);
+
+
+
+   return combinedNormals;
+
+}
 
 
 

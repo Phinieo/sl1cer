@@ -129,6 +129,7 @@ int main(){
          writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
 
 
+/*
          for(int i2 = 0; i2 < (PERIMETERS - 1); i2++){
 
             test = shrinkLoop(test, numLoopEdges);
@@ -136,7 +137,7 @@ int main(){
 
 
          }
-
+*/
 
 
          free(test);
@@ -172,34 +173,22 @@ int main(){
 
    struct edge testEdge;
 
-   testEdge.p1.X = 1.0;
-   testEdge.p1.Y = 0.0;
+   testEdge.p1.X = 0.7071;
+   testEdge.p1.Y = 0.7071;
    testEdge.p1.Z = 0.0;
 
-   testEdge.p2.X = -1.0;
+   testEdge.p2.X = 0.0;
    testEdge.p2.Y = 0.0;
-   testEdge.p2.Z = 0.0;
+   testEdge.p2.Z = 1.0;
 
    testEdge.normal.X = 0.0;
    testEdge.normal.Y = 1.0;
    testEdge.normal.Z = 0.0;
 
-   
-   printf("\nINPUT EDGE:\n\n");
-   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
 
-   testEdge = scaleEdgeInwards(testEdge, 0.5);
+   struct point testPoint = combineNormals(testEdge.p1, testEdge.p2);
 
-   printf("\nOUTPUT EDGE:\n\n");
-   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
-
-   testEdge = shrinkEdge(testEdge, 0.5);
-
-   printf("\nOUTPUT EDGE:\n\n");
-   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",testEdge.p1.X,testEdge.p1.Y,testEdge.p2.X,testEdge.p2.Y,testEdge.normal.X,testEdge.normal.Y,testEdge.normal.Z);
-
-
-
+   printf("\nCOMBINED NORMAL: %f, %f, %f\n",testPoint.X,testPoint.Y,testPoint.Z);
 
 
 
