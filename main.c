@@ -131,7 +131,7 @@ int main(){
 
          for(int i2 = 0; i2 < (PERIMETERS - 1); i2++){
 
-            shrinkLoop(test, INTERNAL_PERIMETER_WIDTH);
+            test = shrinkLoop(test, numLoopEdges);
             writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
 
 

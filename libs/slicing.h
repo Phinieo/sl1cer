@@ -765,8 +765,22 @@ struct edge* shrinkLoop(struct edge* loopEdges, int numLoopEdges){
    //SHRINK ALL LOOPS
    for(int i = 0; i < numLoopEdges; i++){
 
-      //newLoop[i] = scaleEdgeInwards(loopEdges[i], EXTRUSION_WIDTH);
-      newLoop[i] = shrinkEdge(newLoop[i], EXTRUSION_WIDTH);
+      printf("SHRINKING EDGE: %d\n",i);
+
+      
+      printf("\nINPUT EDGE:\n\n");
+      printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f\n\n",loopEdges[i].p1.X,loopEdges[i].p1.Y,loopEdges[i].p2.X,loopEdges[i].p2.Y,loopEdges[i].normal.X,loopEdges[i].normal.Y,loopEdges[i].normal.Z);
+
+
+      newLoop[i] = scaleEdgeInwards(loopEdges[i], EXTRUSION_WIDTH);
+      //newLoop[i] = shrinkEdge(newLoop[i], EXTRUSION_WIDTH);
+
+
+      printf("\nOUTPUT EDGE:\n\n");
+      printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f\n\n",newLoop[i].p1.X,newLoop[i].p1.Y,newLoop[i].p2.X,newLoop[i].p2.Y,newLoop[i].normal.X,newLoop[i].normal.Y,newLoop[i].normal.Z);
+
+
+
 
    }
 /*
