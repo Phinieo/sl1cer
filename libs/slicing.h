@@ -793,8 +793,6 @@ struct edge* shrinkLoop(struct edge* loopEdges, int numLoopEdges, float shrinkDi
    }
 
 
-   free(loopEdges);
-
    return newLoop;
   
 

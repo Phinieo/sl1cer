@@ -57,9 +57,6 @@ void writeEnd(FILE *fp){
 
 
 
-
-
-
 void writeStart(FILE *fp){
 
     fputs(START_GCODES,fp);
@@ -132,6 +129,8 @@ struct edge centerEdge(struct edge e){
 
 
 
+
+
 void layerUp(struct point* currentPoint, FILE *fp){
 
    (*currentPoint).Z += LAYER_HEIGHT;
@@ -168,6 +167,12 @@ void endRetract(float* currentExtrusion, FILE *fp){
    return;
 
 }
+
+
+
+
+
+
 
 
 //POSSIBLE PROBLEM: MOVES TO FIRST POINT, NOT CLOSEST POINT
@@ -235,205 +240,6 @@ void writeLoop(struct edge* loopIN, int numEdges, struct point* currentPoint, fl
 
 }
 
-
-void writeLayerPerim(struct edge* loopsIN, int numEdges, int* edgesPerLoop, int numLoops, struct point* currentPoint, float* currentExtrusion, FILE *fp){
-
-
-
-
-
-   //MAKE NEW ARRAY SO AS TO NOT CHANGE INPUT LOOP ARRAY
-   struct edge* loops = (struct edge*)calloc(sizeof(struct edge),numEdges*numEdges);
-
-
-
-   //MOVE EDGES TO ABSOLUTE POINTS ON PRINTBED
-
-   for(int i = 0; i < numLoops; i++){
-
-      for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
-
-         loops[i * numEdges + i2] = centerEdge(loopsIN[i * numEdges + i2]);
-
-      }
-
-   }
-
-
-
-
-
-
-
-
-
-
-
-   //FIND THE NEAREST EDGE TO CURRENT POSITION TO START PRINTING ON
-
-   // ##POSSIBLE ISSUE## WILL ONLY CHECK THE FIRST POINT OF THE EDGE ##POSSIBLE ISSUE##
-
-
-   float lowestDistance = -1;
-
-   int startEdge = 0;
-
-/*
-
-
-   for(int i = 0; i < numLoops; i++){
-
-      for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
-
-         if( pointDistance(loops[i * numEdges + i2].p1, *currentPoint) < lowestDistance || lowestDistance < 0){
-
-            lowestDistance = pointDistance(loops[i * numEdges + i2].p1, *currentPoint);
-
-            startEdge = i * numEdges + i2;
-
-            printf("NEAREST POINT - Loop: %d, Edge: %d, Dist: %f\n",i,i2,lowestDistance);
-
-         }
-
-      }
-
-   }
-
-
-
-   //GCODE WRITE
-   //MOVE TO NEAREST POINT ON THIS LAYER
-
-   (*currentPoint).X = loops[startEdge].p1.X;
-   (*currentPoint).Y = loops[startEdge].p1.Y;
-
-   writeG1("F", (float[1]){TRAVEL_SPEED}, fp);
-
-   writeG1("XY", (float[2]){loops[startEdge].p1.X, loops[startEdge].p1.Y}, fp);
-
-
-*/
-
-
-
-
-   //GCODE WRITE
-   //MOVE TO NEAREST POINT ON THIS LAYER
-
-   (*currentPoint).X = loops[0].p1.X;
-   (*currentPoint).Y = loops[0].p1.Y;
-
-   writeG1("F", (float[1]){TRAVEL_SPEED}, fp);
-
-   writeG1("XY", (float[2]){loops[0].p1.X, loops[0].p1.Y}, fp);
-
-
-
-   endRetract(currentExtrusion, fp);
-
-
-
-
-   for(int i = 0; i < numLoops; i++){
-
-      //SET SPEED TO PERIMETER
-      writeG1("F", (float[1]){PERIMETER_SPEED}, fp);
-
-      //WRITE ONE LOOP
-      for(int i2 = 0; i2 < edgesPerLoop[i]; i2++){
-
-         
-         for(int i3 = 0; i3 < edgesPerLoop[i]; i3++){
-
-
-
-            if((*currentPoint).X == loops[i * numEdges + i3].p1.X && (*currentPoint).Y == loops[i * numEdges + i3].p1.Y){
-
-               
-
-               (*currentExtrusion) += perimeterExtrusion(pointDistance(loops[i * numEdges + i3].p1, loops[i * numEdges + i3].p2));
-
-               writeG1("XYE", (float[3]){loops[i * numEdges + i3].p2.X, loops[i * numEdges + i3].p2.Y, (*currentExtrusion)}, fp);
-
-               (*currentPoint).X = loops[i * numEdges + i3].p2.X;
-               (*currentPoint).Y = loops[i * numEdges + i3].p2.Y;
-
-               break;
-
-            }
-
-
-
-
-         }
-
-
-      }
-
-
-
-
-
-      //MOVE TO NEXT LOOP
-
-      lowestDistance = -1;
-
-      startEdge = -1;
-
-      for(int i2 = 0; i2 < numLoops; i2++){
-
-         if(i2 > i){
-
-            for(int i3 = 0; i3 < edgesPerLoop[i2]; i3++){
-
-               if(pointDistance(loops[i2 * numEdges + i3].p1, *currentPoint) < lowestDistance || lowestDistance < 0){
-
-                  lowestDistance = pointDistance(loops[i2 * numEdges + i3].p1, *currentPoint);
-
-                  startEdge = i2 * numEdges + i3;
-
-               }
-
-            }
-
-         }
-
-      }
-
-
-      if(startEdge != -1){
-
-         startRetract(currentExtrusion, fp);
-
-
-         (*currentPoint).X = loops[startEdge].p1.X;
-         (*currentPoint).Y = loops[startEdge].p1.Y;
-
-
-         writeG1("F", (float[1]){TRAVEL_SPEED}, fp);
-
-         writeG1("XY", (float[2]){(*currentPoint).X, (*currentPoint).Y}, fp);
-
-         endRetract(currentExtrusion, fp);
-
-
-      }
-
-
-   }
-
-
-
-
-   startRetract(currentExtrusion, fp);
-
-
-   free(loops);
-
-
-   return;
-
-}
 
 
 

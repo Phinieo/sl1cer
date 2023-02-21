@@ -53,19 +53,8 @@ int main(){
    
 
 
-
-
-
-
-
-
-
-/*
-   unsigned int numTriangles = 0;
-
-   struct tri* triangles = readSTL(STL_IN, &numTriangles);
-*/
-
+   //DETECT STL INPUT TYPE AND READ FILE
+   //READS INTO LIST OF TRIANGLES
    unsigned int numTriangles = 0;
 
    struct tri* triangles;
@@ -84,22 +73,18 @@ int main(){
 
 
 
-
+   //CHECK NUMBER OF TRIANGLES
    int numVertices = 0;
 
    struct point* verticeList = calloc(numTriangles*3, sizeof(struct point));
 
-
    for(int i = 0; i < numTriangles; i++){
-
 
       addUniquePoint(triangles[i].p1, verticeList,&numVertices);
 
       addUniquePoint(triangles[i].p2, verticeList,&numVertices);
 
       addUniquePoint(triangles[i].p3, verticeList,&numVertices);
-
-
 
    }
 
@@ -111,34 +96,43 @@ int main(){
 
 
 
+   //MAIN PRINTING LOOP
    int numEdges = 0;
 
    do{
 
+      //GET A LIST OF EDGES WHICH ARE ON THE CURRENT SLICING PLANE
       struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
 
-
+      //COUNT NUMBER OF LOOPS IN THE LIST OF EDGES
       int numLoops = countLoops(layerEdges, numEdges);
 
+      //FOR EACH LOOP - PRINT THE LOOP AND ANY INTERIOR PERIMETERS
       for(int i = 0; i < numLoops; i++){
 
          int numLoopEdges = 0;
 
-         struct edge* test = getLoop(layerEdges, numEdges, i, &numLoopEdges);
+         //GET THE GIVEN LOOP AS A LIST OF CONSECUTIVE EDGES
+         struct edge* currentLoop = getLoop(layerEdges, numEdges, i, &numLoopEdges);
 
-         writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
+         //GENERATE GCODE FOR GIVEN LOOP
+         writeLoop(currentLoop, numLoopEdges, &currentLocation, &currentExtrusion, fp);
 
-
+         //WRITE INTERIOR PERIMETERS
          for(int i2 = 0; i2 < (PERIMETERS - 1); i2++){
 
-            test = shrinkLoop(test, numLoopEdges, INTERNAL_PERIMETER_WIDTH);
-            writeLoop(test, numLoopEdges, &currentLocation, &currentExtrusion, fp);
+            //CREATES A SHRUNKEN LOOP INSIDE A GIVEN LOOP
+            struct edge* temp = shrinkLoop(currentLoop, numLoopEdges, INTERNAL_PERIMETER_WIDTH);
+            free(currentLoop);
+            currentLoop = temp;
+
+            writeLoop(currentLoop, numLoopEdges, &currentLocation, &currentExtrusion, fp);
 
          }
 
 
 
-         free(test);
+         free(currentLoop);
 
       }
 
@@ -166,28 +160,6 @@ int main(){
 
    //CLOSE THE FILE POINTER
    fclose(fp);
-
-
-
-   struct edge testEdge;
-
-   testEdge.p1.X = 0.7071;
-   testEdge.p1.Y = 0.7071;
-   testEdge.p1.Z = 0.0;
-
-   testEdge.p2.X = 0.0;
-   testEdge.p2.Y = 0.0;
-   testEdge.p2.Z = 1.0;
-
-   testEdge.normal.X = 0.0;
-   testEdge.normal.Y = 1.0;
-   testEdge.normal.Z = 0.0;
-
-
-   struct point testPoint = combineNormals(testEdge.p1, testEdge.p2);
-
-   printf("\nCOMBINED NORMAL: %f, %f, %f\n",testPoint.X,testPoint.Y,testPoint.Z);
-
 
 
 

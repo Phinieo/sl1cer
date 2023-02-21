@@ -92,7 +92,7 @@ float pointDistance(struct point p1, struct point p2){
 
 
 
-
+//TERNARY STATEMENT MIGHT BE UNNECESSARY
 struct point combineNormals(struct point normal1, struct point normal2){
 
    struct point zero;
@@ -122,7 +122,7 @@ struct point combineNormals(struct point normal1, struct point normal2){
 }
 
 
-
+//TERNARY STATEMENT MIGHT BE UNNECESSARY
 struct point normal3Dto2D(struct point normal3D){
 
    struct point zero;
@@ -153,91 +153,6 @@ struct point normal3Dto2D(struct point normal3D){
 }
 
 
-
-
-
-
-//SHRINKS EDGE TOWARDS ITS CENTER BY A SET AMOUNT ON EITHER SIDE
-//2D FUNCTION -- RETURNS IDENTICAL Z VALUES TO INPUG EDGE
-//RETURNS IDENTICAL NORMAL ON EDGE BUT ONLY CONSIDERS 2D NORMAL
-struct edge shrinkEdge(struct edge edgeIn, float shrinkLength){
-
-   struct edge shrunkEdge;
-
-   shrunkEdge.normal = normal3Dto2D(edgeIn.normal);
-
-
-   if(edgeIn.p1.X > edgeIn.p2.X){
-
-      shrunkEdge.p1.X = edgeIn.p1.X - fabs(shrunkEdge.normal.Y * shrinkLength);
-      shrunkEdge.p2.X = edgeIn.p2.X + fabs(shrunkEdge.normal.Y * shrinkLength);
-
-   }else{
-
-      shrunkEdge.p1.X = edgeIn.p1.X + fabs(shrunkEdge.normal.Y * shrinkLength);
-      shrunkEdge.p2.X = edgeIn.p2.X - fabs(shrunkEdge.normal.Y * shrinkLength);
-
-   }
-
-   if(edgeIn.p1.Y > edgeIn.p2.Y){
-
-      shrunkEdge.p1.Y = edgeIn.p1.Y - fabs(shrunkEdge.normal.X * shrinkLength);
-      shrunkEdge.p2.Y = edgeIn.p2.Y + fabs(shrunkEdge.normal.X * shrinkLength);
-
-   }else{
-
-      shrunkEdge.p1.Y = edgeIn.p1.Y + fabs(shrunkEdge.normal.X * shrinkLength);
-      shrunkEdge.p2.Y = edgeIn.p2.Y - fabs(shrunkEdge.normal.X * shrinkLength);
-
-   }
-
-
-   shrunkEdge.p1.Z = edgeIn.p1.Z;
-   shrunkEdge.p2.Z = edgeIn.p2.Z;
-
-   shrunkEdge.normal.X = edgeIn.normal.X;
-   shrunkEdge.normal.Y = edgeIn.normal.Y;
-   shrunkEdge.normal.Z = edgeIn.normal.Z;
-
-
-   return shrunkEdge;
-
-}
-
-
-
-
-
-
-
-
-struct edge scaleEdgeInwards(struct edge bigEdge, float distIn){
-
-   struct edge smallEdge = bigEdge;
-
-   smallEdge.normal = normal3Dto2D(bigEdge.normal);
-
-   smallEdge.p1.X = smallEdge.p1.X + (smallEdge.normal.X * distIn * -1);
-   smallEdge.p1.Y = smallEdge.p1.Y + (smallEdge.normal.Y * distIn * -1);
-
-
-   smallEdge.p2.X = smallEdge.p2.X + (smallEdge.normal.X * distIn * -1);
-   smallEdge.p2.Y = smallEdge.p2.Y + (smallEdge.normal.Y * distIn * -1);
-
-/*
-
-   printf("\nINPUT EDGE:\n\n");
-   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",bigEdge.p1.X,bigEdge.p1.Y,bigEdge.p2.X,bigEdge.p2.Y,bigEdge.normal.X,bigEdge.normal.Y,bigEdge.normal.Z);
-
-   printf("\nOUTPUT EDGE:\n\n");
-   printf("X: %f Y: %f -- X: %f Y: %f, NORMAL: %f,%f,%f",smallEdge.p1.X,smallEdge.p1.Y,smallEdge.p2.X,smallEdge.p2.Y,smallEdge.normal.X,smallEdge.normal.Y,smallEdge.normal.Z);
-
-*/
-
-
-   return smallEdge;
-
-}
 
 
 
@@ -275,7 +190,7 @@ int triFacesDown(struct tri t){
 
 
 
-
+//TERNARY STATEMENT MIGHT BE UNNECESSARY
 struct point computeNormal(struct tri Triangle){
 
    struct point temp;
@@ -364,67 +279,5 @@ struct point intersection(struct edge edge1, struct edge edge2){
    return intersectPoint;
 
 }
-
-
-
-//This generates normals but they are inverted
-
-/*
-struct point computeNormal(struct tri Triangle){
-
-   struct point temp;
-
-   struct point zero;
-   zero.X = 0;
-   zero.Y = 0;
-   zero.Z = 0;
-
-
-   //Dir = (B - A) x (C - A)
-   //Norm = Dir / len(Dir)
-
-
-   struct point BminusA;
-
-   BminusA.X = Triangle.p2.X - Triangle.p1.X;
-   BminusA.Y = Triangle.p2.Y - Triangle.p1.Y;
-   BminusA.Z = Triangle.p2.Z - Triangle.p1.Z;
-
-
-
-   struct point BminusC;
-
-   BminusC.X = Triangle.p2.X - Triangle.p3.X;
-   BminusC.Y = Triangle.p2.Y - Triangle.p3.Y;
-   BminusC.Z = Triangle.p2.Z - Triangle.p3.Z;
-
-
-   //cx = aybz − azby
-   //cy = azbx − axbz
-   //cz = axby − aybx
-
-
-
-   temp.X = (BminusA.Y * BminusC.Z) - (BminusA.Z * BminusC.Y);
-   temp.Y = (BminusA.Z * BminusC.X) - (BminusA.X * BminusC.Z);
-   temp.Z = (BminusA.X * BminusC.Y) - (BminusA.Y * BminusC.X);
-
-
-   float magnitude = pointDistance(zero, temp);
-
-   temp.X = temp.X / magnitude;
-
-   temp.Y = temp.Y / magnitude;
-
-   temp.Z = temp.Z / magnitude;
-
-
-
-
-   return temp;
-
-}
-
-*/
 
 
