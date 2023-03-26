@@ -7,9 +7,14 @@
 #include "libs/extrusion.h"
 #include "libs/gcode.h"
 
-
+#include <time.h>
 
 int main(){
+
+   clock_t start, end;
+   double cpu_time_used;
+
+   start = clock();
 
 
    FILE *fp;
@@ -101,11 +106,24 @@ int main(){
 
    do{
 
+      printf("CURRENT HEIGHT: %f\n\n", currentLocation.Z);
+
       //GET A LIST OF EDGES WHICH ARE ON THE CURRENT SLICING PLANE
-      struct edge* layerEdges = slice(triangles, numTriangles, currentLocation.Z, &numEdges);
+      struct edge* layerEdges = sliceFaster(triangles, numTriangles, currentLocation.Z, &numEdges);
+
+
+      for(int i = 0; i < numEdges; i++){
+
+         printf("EDGE %d: %f, %f TO %f, %f\n",i, layerEdges[i].p1.X, layerEdges[i].p1.Y, layerEdges[i].p2.X, layerEdges[i].p2.Y);
+
+      }
+
+      printf("TEST1\n");
 
       //COUNT NUMBER OF LOOPS IN THE LIST OF EDGES
       int numLoops = countLoops(layerEdges, numEdges);
+
+      printf("TEST2\n");
 
       //FOR EACH LOOP - PRINT THE LOOP AND ANY INTERIOR PERIMETERS
       for(int i = 0; i < numLoops; i++){
@@ -161,6 +179,12 @@ int main(){
    //CLOSE THE FILE POINTER
    fclose(fp);
 
+
+   end = clock();
+
+   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+   printf("\n\nTIME USED: %f\n\n",cpu_time_used);
 
 
    return 0;

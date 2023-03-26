@@ -696,7 +696,7 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
                   //PREVENTS IDENTICAL OR REVERSED EDGES
                   if(addUniqueEdge(tempEdge,layerEdges,layerEdgesI)){
 
-                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
+                     //printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
  
                   }
 
@@ -719,7 +719,7 @@ struct edge* pointsToEdges(struct point* layerPoints, int layerPointsI, struct t
                   //PREVENTS IDENTICAL OR REVERSED EDGES
                   if(addUniqueEdge(tempEdge,layerEdges,layerEdgesI)){
 
-                     printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
+                     //printf("\n\nEDGE: %f,%f and %f,%f",layerEdges[*layerEdgesI-1].p1.X,layerEdges[*layerEdgesI-1].p1.Y,layerEdges[*layerEdgesI-1].p2.X,layerEdges[*layerEdgesI-1].p2.Y);
  
                   }
 
@@ -1025,9 +1025,6 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-
-
-
    //FIND MAX HEIGHT
    float maxHeight = 0;
 
@@ -1065,34 +1062,9 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    //not sure what to set the maximum number of possible layer vertices as
    struct point layerPoints[numTriangles];
    int layerPointsI = 0;
-
-
-
-
-
-
 
 
 
@@ -1147,7 +1119,7 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
-
+/*
       printf("%d Points\n",layerPointsI);
 
 
@@ -1166,7 +1138,7 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
          }
 
       }
-
+*/
 
 
 
@@ -1330,7 +1302,7 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
       //SLICING DONE (EXCEPT FOR POSSIBLE TOP LAYER) EXECUTE CONVERSION TO G-CODE 
 
 
-
+/*
       printf("%d Points\n",layerPointsI);
 
 
@@ -1349,7 +1321,7 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
          }
 
       }
-
+*/
 
 
 
@@ -1378,6 +1350,411 @@ struct edge* slice(struct tri* triangles, int numTriangles, float currentHeight,
 
 
 
+
+
+
+
+
+
+//DOES NOT DO FINAL LAYER WHEN SLIGHTLY OVER MODEL'S TOP LAYER
+
+//RETURNED POINTER MUST BE FREE'D
+struct edge* sliceFaster(struct tri* triangles, int numTriangles, float currentHeight, int *layerEdgesI){
+
+
+
+
+   //FIND MAX HEIGHT
+   float maxHeight = 0;
+
+
+   for(int i = 0; i < numTriangles; i++){
+
+
+      if(triangles[i].p1.Z > maxHeight){
+
+         maxHeight = triangles[i].p1.Z;
+
+      }
+
+
+      if(triangles[i].p2.Z > maxHeight){
+
+         maxHeight = triangles[i].p2.Z;
+
+      }
+
+
+      if(triangles[i].p3.Z > maxHeight){
+
+         maxHeight = triangles[i].p3.Z;
+
+      }
+
+
+   }
+
+
+   printf("\n\n\n\n\nMAX HEIGHT: %f\n\n\n\n\n\n",maxHeight);
+
+
+
+   int intersectedTriangleIndecies[numTriangles];
+   int numIntersectedTriangles = 0;
+
+
+   //FIND THE NUMBER OF INTERSECTED TRIANGLES
+   for(int i = 0; i < numTriangles; i++){
+
+      //ADD TRIANGLE TO INTERSECTED LIST IF ONE POINT IS EXACTLY ON A VERTICE
+      if(!(triFacesDown(triangles[i]) || triFacesUp(triangles[i]))){
+
+         if(triangles[i].p1.Z == currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+         if(triangles[i].p2.Z == currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+         if(triangles[i].p3.Z == currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+
+      }
+
+
+      //FIND A POINT BELOW THE CURRENT LAYER
+      if(triangles[i].p1.Z < currentHeight){
+
+
+         if(triangles[i].p2.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+         if(triangles[i].p3.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+
+      }
+
+      //FIND A POINT BELOW THE CURRENT LAYER
+      if(triangles[i].p2.Z < currentHeight){
+
+
+         if(triangles[i].p1.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+         if(triangles[i].p3.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+
+      }
+
+      //FIND A POINT BELOW THE CURRENT LAYER
+      if(triangles[i].p3.Z < currentHeight){
+
+
+         if(triangles[i].p1.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+         if(triangles[i].p2.Z > currentHeight){
+
+            intersectedTriangleIndecies[numIntersectedTriangles] = i;
+            numIntersectedTriangles++;
+            continue;
+
+         }
+
+
+      }
+
+
+
+   }
+
+
+   //LAYER EDGES ARRAY
+   //MUST BE FREE'D
+   struct edge* layerEdges = (struct edge*)calloc(sizeof(struct edge),numIntersectedTriangles);
+   (*layerEdgesI) = 0;
+
+
+   //INTERSECTED TRIANGLES ARRAY
+   //MUST BE FREE'D
+   struct tri* layerTriangles = (struct tri*)calloc(sizeof(struct tri),numIntersectedTriangles);
+   int layerTrianglesI = numIntersectedTriangles;
+
+   //COPY OVER INTERSECTED TRIANGLES
+   for(int i = 0; i < numIntersectedTriangles; i++){
+
+      layerTriangles[i] = triangles[intersectedTriangleIndecies[i]];
+
+   }
+
+
+   
+   for(int i = 0; i < layerTrianglesI; i++){
+
+/*
+      printf("TRIANGLE:\n\n");
+      printf("P1: %f, %f, %f\n",layerTriangles[i].p1.X,layerTriangles[i].p1.Y,layerTriangles[i].p1.Z);
+      printf("P2: %f, %f, %f\n",layerTriangles[i].p2.X,layerTriangles[i].p2.Y,layerTriangles[i].p2.Z);
+      printf("P3: %f, %f, %f\n",layerTriangles[i].p3.X,layerTriangles[i].p3.Y,layerTriangles[i].p3.Z);
+*/
+
+      struct edge tempEdge;
+
+
+
+      //IF P1 IS ABOVE AND P2, P3 ARE BELOW
+      if(layerTriangles[i].p1.Z > currentHeight && layerTriangles[i].p2.Z < currentHeight && layerTriangles[i].p3.Z < currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p1, layerTriangles[i].p2);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p1, layerTriangles[i].p3);
+
+         tempEdge.normal = layerTriangles[i].normal;
+         
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+      //IF P2 IS ABOVE AND P1, P3 ARE BELOW
+      if(layerTriangles[i].p2.Z > currentHeight && layerTriangles[i].p1.Z < currentHeight && layerTriangles[i].p3.Z < currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p2, layerTriangles[i].p1);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p2, layerTriangles[i].p3);
+
+         tempEdge.normal = layerTriangles[i].normal;
+
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+      //IF P3 IS ABOVE AND P1, P2 ARE BELOW
+      if(layerTriangles[i].p3.Z > currentHeight && layerTriangles[i].p1.Z < currentHeight && layerTriangles[i].p2.Z < currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p3, layerTriangles[i].p1);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p3, layerTriangles[i].p2);
+
+         tempEdge.normal = layerTriangles[i].normal;
+
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+
+
+
+      //IF P1 IS BELOW AND P2, P3 ARE ABOVE
+      if(layerTriangles[i].p1.Z < currentHeight && layerTriangles[i].p2.Z > currentHeight && layerTriangles[i].p3.Z > currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p1, layerTriangles[i].p2);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p1, layerTriangles[i].p3);
+
+         tempEdge.normal = layerTriangles[i].normal;
+
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+      //IF P2 IS BELOW AND P1, P3 ARE ABOVE
+      if(layerTriangles[i].p2.Z < currentHeight && layerTriangles[i].p1.Z > currentHeight && layerTriangles[i].p3.Z > currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p2, layerTriangles[i].p1);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p2, layerTriangles[i].p3);
+
+         tempEdge.normal = layerTriangles[i].normal;
+
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+      //IF P3 IS BELOW AND P1, P2 ARE ABOVE
+      if(layerTriangles[i].p3.Z < currentHeight && layerTriangles[i].p1.Z > currentHeight && layerTriangles[i].p2.Z > currentHeight){
+
+         tempEdge.p1 = intersectLine(currentHeight, layerTriangles[i].p3, layerTriangles[i].p1);
+         tempEdge.p2 = intersectLine(currentHeight, layerTriangles[i].p3, layerTriangles[i].p2);
+
+         tempEdge.normal = layerTriangles[i].normal;
+
+         //ADD THE GENERATED EDGE
+         addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+         continue;
+
+      }
+
+
+      //FINDS EDGES THAT LIE ON THE EDGE OF A TRIANGLE
+      //THERE IS SOME REPETITION OF EDGE CASES INCLUDED FOR CLARITY
+
+
+      if(layerTriangles[i].p1.Z == currentHeight){
+
+         //IF P1 AND P2 FORM AN EDGE
+         if(layerTriangles[i].p2.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p1;
+            tempEdge.p2 = layerTriangles[i].p2;
+
+            tempEdge.normal = layerTriangles[i].normal;
+            
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+         }
+
+         //IF P1 AND P3 FORM AN EDGE
+         if(layerTriangles[i].p3.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p1;
+            tempEdge.p2 = layerTriangles[i].p3;
+
+            tempEdge.normal = layerTriangles[i].normal;
+
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+
+         }
+
+      }
+
+
+      if(layerTriangles[i].p2.Z == currentHeight){
+
+         //IF P2 AND P1 FORM AN EDGE
+         if(layerTriangles[i].p1.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p2;
+            tempEdge.p2 = layerTriangles[i].p1;
+
+            tempEdge.normal = layerTriangles[i].normal;
+
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+
+         }
+
+         //IF P2 AND P3 FORM AN EDGE
+         if(layerTriangles[i].p3.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p2;
+            tempEdge.p2 = layerTriangles[i].p3;
+
+            tempEdge.normal = layerTriangles[i].normal;
+
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+
+         }
+
+      }
+
+      if(layerTriangles[i].p3.Z == currentHeight){
+
+         //IF P3 AND P1 FORM AN EDGE
+         if(layerTriangles[i].p1.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p3;
+            tempEdge.p2 = layerTriangles[i].p1;
+
+            tempEdge.normal = layerTriangles[i].normal;
+
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+
+         }
+
+         //IF P3 AND P2 FORM AN EDGE
+         if(layerTriangles[i].p2.Z == currentHeight){
+
+            tempEdge.p1 = layerTriangles[i].p3;
+            tempEdge.p2 = layerTriangles[i].p2;
+
+            tempEdge.normal = layerTriangles[i].normal;
+
+            //ADD THE GENERATED EDGE
+            addUniqueEdge(tempEdge, layerEdges, layerEdgesI);
+
+            continue;
+
+         }
+
+      }
+
+
+
+   }
+
+   //printf("LAYEREDGESI: %d\n\n",(*layerEdgesI));
+
+   free(layerTriangles);
+
+   return layerEdges;
+
+}
 
 
 
