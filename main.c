@@ -4,6 +4,7 @@
 #include "libs/structs.h"
 #include "libs/readSTL.h"
 #include "libs/slicing.h"
+#include "libs/infill.h"
 #include "libs/extrusion.h"
 #include "libs/gcode.h"
 
@@ -112,18 +113,9 @@ int main(){
       struct edge* layerEdges = sliceFaster(triangles, numTriangles, currentLocation.Z, &numEdges);
 
 
-      for(int i = 0; i < numEdges; i++){
-
-         printf("EDGE %d: %f, %f TO %f, %f\n",i, layerEdges[i].p1.X, layerEdges[i].p1.Y, layerEdges[i].p2.X, layerEdges[i].p2.Y);
-
-      }
-
-      printf("TEST1\n");
-
       //COUNT NUMBER OF LOOPS IN THE LIST OF EDGES
       int numLoops = countLoops(layerEdges, numEdges);
 
-      printf("TEST2\n");
 
       //FOR EACH LOOP - PRINT THE LOOP AND ANY INTERIOR PERIMETERS
       for(int i = 0; i < numLoops; i++){
@@ -135,6 +127,7 @@ int main(){
 
          //GENERATE GCODE FOR GIVEN LOOP
          writeLoop(currentLoop, numLoopEdges, &currentLocation, &currentExtrusion, fp);
+
 
          //WRITE INTERIOR PERIMETERS
          for(int i2 = 0; i2 < (PERIMETERS - 1); i2++){
@@ -148,9 +141,11 @@ int main(){
 
          }
 
-
+         generateInfill(currentLoop, numLoopEdges);
 
          free(currentLoop);
+
+
 
       }
 
@@ -159,8 +154,6 @@ int main(){
 
 
       free(layerEdges);
-
-      //free(loops);
 
 
    }while(numEdges > 0);
