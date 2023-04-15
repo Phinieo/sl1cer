@@ -126,6 +126,104 @@ struct edge centerEdge(struct edge e){
 
 
 
+//DETERMINES THE MODEL'S MIN AND MAX X AN Y
+//CENTERS THE MODEL INSIDE THE POSITIVE X,Y SPACE ON THE PRINTBED
+//MAKES THE MODEL'S LOWEST POINT BE Z = 0
+
+//CHANGES INPUT EDGE LIST
+struct tri* centerOnPrintBed(struct tri* triangles, unsigned int numTriangles){
+
+
+   float maxInputX = FLT_MIN;
+   float minInputX = FLT_MAX;
+
+   float maxInputY = FLT_MIN;
+   float minInputY = FLT_MAX;
+
+   float minInputZ = FLT_MAX;
+
+
+   //DETERMINE MIN AND MAX XYZ VALUES
+   for(int i = 0; i < numTriangles; i++){
+
+      //CHECK P1
+      if(triangles[i].p1.X < minInputX){ minInputX = triangles[i].p1.X; }
+      if(triangles[i].p1.X > maxInputX){ maxInputX = triangles[i].p1.X; }
+
+      if(triangles[i].p1.Y < minInputY){ minInputY = triangles[i].p1.Y; }
+      if(triangles[i].p1.Y > maxInputY){ maxInputY = triangles[i].p1.Y; }
+
+      if(triangles[i].p1.Z < minInputZ){ minInputZ = triangles[i].p1.Z; }
+
+
+      //CHECK P2
+      if(triangles[i].p2.X < minInputX){ minInputX = triangles[i].p2.X; }
+      if(triangles[i].p2.X > maxInputX){ maxInputX = triangles[i].p2.X; }
+
+      if(triangles[i].p2.Y < minInputY){ minInputY = triangles[i].p2.Y; }
+      if(triangles[i].p2.Y > maxInputY){ maxInputY = triangles[i].p2.Y; }
+
+      if(triangles[i].p2.Z < minInputZ){ minInputZ = triangles[i].p2.Z; }
+
+
+      //CHECK P3
+      if(triangles[i].p3.X < minInputX){ minInputX = triangles[i].p3.X; }
+      if(triangles[i].p3.X > maxInputX){ maxInputX = triangles[i].p3.X; }
+
+      if(triangles[i].p3.Y < minInputY){ minInputY = triangles[i].p3.Y; }
+      if(triangles[i].p3.Y > maxInputY){ maxInputY = triangles[i].p3.Y; }
+
+      if(triangles[i].p3.Z < minInputZ){ minInputZ = triangles[i].p3.Z; }
+      
+
+   }
+
+
+   float xCenter = maxInputX - ((maxInputX - minInputX)/2);
+   float yCenter = maxInputY - ((maxInputY - minInputY)/2);
+
+   printf("\n\n\n X CENTER: %f\nY CENTER: %f\n\n\n",xCenter,yCenter);
+
+   
+   //APPLY TRANSFORMATION TO GET ALL POINTS CENTERED AROUND Z AXIS AND LIEING ABOVE XY PLANE
+   
+   //AFTER CENTERING AROUND AXIS, CENTER TO BUILD PLATE
+   for(int i = 0; i < numTriangles; i++){
+
+      //MOVE P1 TO ORIGIN
+      triangles[i].p1.X = triangles[i].p1.X - xCenter;
+      triangles[i].p1.Y = triangles[i].p1.Y - yCenter;
+
+      triangles[i].p1.Z = triangles[i].p1.Z - minInputZ;
+
+      //MOVE P2 TO ORIGIN
+      triangles[i].p2.X = triangles[i].p2.X - xCenter;
+      triangles[i].p2.Y = triangles[i].p2.Y - yCenter;
+
+      triangles[i].p2.Z = triangles[i].p2.Z - minInputZ;
+
+      //MOVE P3 TO ORIGIN
+      triangles[i].p3.X = triangles[i].p3.X - xCenter;
+      triangles[i].p3.Y = triangles[i].p3.Y - yCenter;
+
+      triangles[i].p3.Z = triangles[i].p3.Z - minInputZ;
+
+
+      //CENTER EDGE TO BUILD PLATE
+      triangles[i] = centerTriangle(triangles[i]);
+
+      printf("CENTERED TRIANGLE:\n");
+      printf("P1: %f, %f, %f\n",triangles[i].p1.X,triangles[i].p1.Y,triangles[i].p1.Z);
+      printf("P2: %f, %f, %f\n",triangles[i].p2.X,triangles[i].p2.Y,triangles[i].p2.Z);
+      printf("P3: %f, %f, %f\n",triangles[i].p3.X,triangles[i].p3.Y,triangles[i].p3.Z);
+
+   }
+
+
+   return triangles;
+
+}
+
 
 
 
@@ -182,13 +280,11 @@ void writeLoop(struct edge* loopIN, int numEdges, struct point* currentPoint, fl
    //MAKE NEW ARRAY SO AS TO NOT CHANGE INPUT LOOP ARRAY
    struct edge* loop = (struct edge*)calloc(sizeof(struct edge),numEdges);
 
-
-
-   //MOVE EDGES TO ABSOLUTE POINTS ON PRINTBED
-
+   //MAY NOT BE NECESSARY ANYMORE
    for(int i = 0; i < numEdges; i++){
 
-      loop[i] = centerEdge(loopIN[i]);
+      //loop[i] = centerEdge(loopIN[i]);
+      loop[i] = loopIN[i];
 
    }
 

@@ -785,13 +785,14 @@ struct edge* shrinkLoop(struct edge* loopEdges, int numLoopEdges, float shrinkDi
       newLoop[i].normal = loopEdges[i].normal;
    }
 
+/*
    for(int i = 0; i < numLoopEdges; i++){
 
       printf("UNSHRK EDGE %d: %f, %f to %f, %f\n", i, loopEdges[i].p1.X,loopEdges[i].p1.Y,loopEdges[i].p2.X,loopEdges[i].p2.Y);
       printf("SHRUNK EDGE %d: %f, %f to %f, %f\n\n", i, newLoop[i].p1.X, newLoop[i].p1.Y, newLoop[i].p2.X, newLoop[i].p2.Y);
 
    }
-
+*/
 
    return newLoop;
   

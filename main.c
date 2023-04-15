@@ -78,6 +78,12 @@ int main(){
 
 
 
+   //CENTER INPUT GEOMETRY TO PRINTBED
+   triangles = centerOnPrintBed(triangles, numTriangles);
+
+
+
+
 
    //CHECK NUMBER OF TRIANGLES
    int numVertices = 0;
@@ -141,7 +147,7 @@ int main(){
 
          }
 
-         generateInfill(currentLoop, numLoopEdges);
+         //generateInfill(currentLoop, numLoopEdges);
 
          free(currentLoop);
 
