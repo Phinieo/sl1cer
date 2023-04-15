@@ -151,6 +151,14 @@ int main(){
 
          struct edge* infillEdges = generateInfill(currentLoop, numLoopEdges, &numInfillEdges);
 
+         if(infillEdges != NULL){
+
+            writeEdges(infillEdges, numInfillEdges, &currentLocation, &currentExtrusion, fp);
+
+         }
+         
+
+
          printf("NUMBER INFILL EDGES: %d:\n\n",numInfillEdges);
 
          for(int x = 0; x < numInfillEdges; x++){
@@ -159,6 +167,7 @@ int main(){
 
          }
 
+         free(infillEdges);
 
          free(currentLoop);
 

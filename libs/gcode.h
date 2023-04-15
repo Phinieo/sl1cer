@@ -339,4 +339,51 @@ void writeLoop(struct edge* loopIN, int numEdges, struct point* currentPoint, fl
 
 
 
+//WRITES A LIST OF EDGES IN THE PROVIDED ORDER
+//USED FOR PRINTING INFILL
+void writeEdges(struct edge* edges, int numEdges, struct point* currentPoint, float* currentExtrusion, FILE *fp){
+
+
+
+
+
+   for(int i = 0; i < numEdges; i++){
+
+      //MOVE TO EDGE START
+      (*currentPoint).X = edges[0].p1.X;
+      (*currentPoint).Y = edges[0].p1.Y;
+
+      writeG1("F", (float[1]){TRAVEL_SPEED}, fp);
+
+      writeG1("XY", (float[2]){edges[i].p1.X, edges[i].p1.Y}, fp);
+
+
+
+      //END RETRACT TO START PRINTING
+      endRetract(currentExtrusion, fp);
+
+
+      //SET SPEED FOR PRINTING INFILL
+      writeG1("F", (float[1]){INFILL_SPEED}, fp);
+
+      (*currentExtrusion) += infillExtrusion(pointDistance(edges[i].p1, edges[i].p2));
+
+      writeG1("XYE", (float[3]){edges[i].p2.X, edges[i].p2.Y, (*currentExtrusion)}, fp);
+
+
+
+
+      //START RETRACT FOR NEXT TRAVEL
+      startRetract(currentExtrusion, fp);
+
+
+   }
+
+
+   return;
+
+}
+
+
+
 
