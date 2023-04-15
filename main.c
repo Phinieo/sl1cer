@@ -147,7 +147,18 @@ int main(){
 
          }
 
-         generateInfill(currentLoop, numLoopEdges);
+         int numInfillEdges = 0;
+
+         struct edge* infillEdges = generateInfill(currentLoop, numLoopEdges, &numInfillEdges);
+
+         printf("NUMBER INFILL EDGES: %d:\n\n",numInfillEdges);
+
+         for(int x = 0; x < numInfillEdges; x++){
+
+            printf("%f, %f TO %f, %f\n",infillEdges[x].p1.X,infillEdges[x].p1.Y,infillEdges[x].p2.X,infillEdges[x].p2.Y);
+
+         }
+
 
          free(currentLoop);
 

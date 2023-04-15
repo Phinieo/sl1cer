@@ -1,6 +1,6 @@
 
 
-struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
+struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges, int *infillEdgesI){
 
    //IF INFILL_SPACING < 0 THEN NO INFILL IS NEEDED
    if(INFILL_SPACING < 0){
@@ -16,7 +16,7 @@ struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
 
    struct edge* infillEdges = calloc(predictedNumInfillEdges, sizeof(struct edge));
    
-   int infillEdgesI = 0;
+   (*infillEdgesI) = 0;
 
 
    for(int i = 0; i < MAX_X; i += INFILL_SPACING){
@@ -24,6 +24,14 @@ struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
       struct point* intersections = calloc(numPerimeterEdges, sizeof(struct point));
 
       int intersectionsI = 0;
+
+
+      struct edge tempEdge;
+      tempEdge.normal.X = 1.0;
+      tempEdge.normal.Y = 0.0;
+      tempEdge.normal.Z = 0.0;
+
+      int numTempEdgePoints = 0;
 
       
       //VERTICAL LINE OF POTENTIAL INFILL
@@ -43,8 +51,28 @@ struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
 
          if(temp.X != FLT_MAX && temp.Y != FLT_MAX){
 
-            printf("FOUND VERTICAL INTERSECTION ON: \n");
-            printf("%f, %f to %f, %f\n",perimeterEdges[i2].p1.X,perimeterEdges[i2].p1.Y,perimeterEdges[i2].p2.X,perimeterEdges[i2].p2.Y);
+            //printf("FOUND VERTICAL INTERSECTION ON: \n");
+            //printf("%f, %f to %f, %f\n",perimeterEdges[i2].p1.X,perimeterEdges[i2].p1.Y,perimeterEdges[i2].p2.X,perimeterEdges[i2].p2.Y);
+
+            //IF THIS IS THE FIRST POINT ADD TO EDGE
+            if(numTempEdgePoints == 0){
+               
+               tempEdge.p1 = temp;
+               
+               numTempEdgePoints++;
+
+            //IF THIS IS THE SECOND POINT, MAKE EDGE AND ADD TO LIST
+            }else{
+               
+               tempEdge.p2 = temp;
+
+               infillEdges[(*infillEdgesI)] = tempEdge;
+               (*infillEdgesI) += 1;
+               
+               numTempEdgePoints = 0;
+
+            }
+
 
             intersections[intersectionsI] = temp;
             intersectionsI++;
@@ -53,16 +81,21 @@ struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
 
       }
 
-
+/*
       for(int i2 = 0; i2 < intersectionsI; i2++){
 
          printf("INTERSECTION: %f,%f\n",intersections[i2].X,intersections[i2].Y);
 
       }
+*/
+
 
 
       free(intersections);
 
    }
+
+
+   return(infillEdges);
 
 }
