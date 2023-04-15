@@ -263,7 +263,7 @@ struct point intersection(struct edge edge1, struct edge edge2){
    if(t >= 0 && t <= 1 && u >= 0 && u <= 1){
 
       intersectPoint.X = edge1.p1.X + ( t * (edge1.p2.X - edge1.p1.X));
-      intersectPoint.Y = edge1.p1.Y + ( t * (edge1.p2.X - edge1.p1.X));
+      intersectPoint.Y = edge1.p1.Y + ( t * (edge1.p2.Y - edge1.p1.Y));
 
    }else{
 

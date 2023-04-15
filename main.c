@@ -147,7 +147,7 @@ int main(){
 
          }
 
-         //generateInfill(currentLoop, numLoopEdges);
+         generateInfill(currentLoop, numLoopEdges);
 
          free(currentLoop);
 
