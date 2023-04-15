@@ -50,7 +50,14 @@ struct edge* generateInfill(struct edge* perimeterEdges, int numPerimeterEdges){
 
       }
 
-      printf("INFILL INTERSECTIONS X = %d: %d\n",i,intersectionsI);
+
+      printf("numPerimeterEdges: %d\n",numPerimeterEdges);
+
+      for(int i2 = 0; i2 < intersectionsI; i2++){
+
+         printf("INTERSECTION: %f,%f\n",intersections[i2].X,intersections[i2].Y);
+
+      }
 
       free(intersections);
 
