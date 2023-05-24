@@ -8,6 +8,7 @@ int binaryOrAsciiSTL(char* filename){
    if(fp == NULL){
 
       printf("\n\nERROR: FILE COULD NOT BE OPENED\n\n");
+      printf("--%s--\n",filename);
       return -1;
 
    }
@@ -23,11 +24,13 @@ int binaryOrAsciiSTL(char* filename){
    //IF THE FILE STARTS WTIH "solid" IT IS AN ASCII STL
    if(strstr(fileStart, "solid")){
 
+      fclose(fp);
       return 0;
 
    }
 
    //IF THE FILE DOES NOT START WITH "solid" IT IS A BINARY STL
+   fclose(fp);
    return 1;
    
 

@@ -1,6 +1,7 @@
 #include "libs/libs.h"
-#include "configs.h"
+//#include "configs.h"
 
+#include "libs/readConfig.h"
 #include "libs/structs.h"
 #include "libs/readSTL.h"
 #include "libs/slicing.h"
@@ -17,6 +18,9 @@ int main(){
 
    start = clock();
 
+
+   //READ CONFIGURATION FILE
+   readConfig("sl1cer.conf");
 
    FILE *fp;
 
@@ -55,9 +59,13 @@ int main(){
 
 
 
-   //DO PRINTING
+   //READ INPUTS
+
    
 
+
+   
+   printf("MAIN: PERIMETERS: --%f--",PERIMETERS);
 
    //DETECT STL INPUT TYPE AND READ FILE
    //READS INTO LIST OF TRIANGLES
@@ -204,6 +212,13 @@ int main(){
    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
    printf("\n\nTIME USED: %f\n\n",cpu_time_used);
+
+
+   //FREE GLOBAL STRING VARIABLES
+   free(STL_IN);
+   free(GCODE_OUT);
+   free(START_GCODES);
+   free(END_GCODES);
 
 
    return 0;
