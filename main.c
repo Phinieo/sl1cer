@@ -11,7 +11,7 @@
 
 #include <time.h>
 
-int main(){
+int main( int argc, char *argv[] ){
 
    clock_t start, end;
    double cpu_time_used;
@@ -21,6 +21,16 @@ int main(){
 
    //READ CONFIGURATION FILE
    readConfig("sl1cer.conf");
+
+   if( argc == 2 ) {
+      STL_IN = argv[1];
+   }
+   else if( argc > 2 ) {
+      printf("Too many arguments supplied.\n");
+   }
+   else {
+      printf("No input STL specified. Using STL from sl1cer.conf file.\n");
+   }
 
    FILE *fp;
 
